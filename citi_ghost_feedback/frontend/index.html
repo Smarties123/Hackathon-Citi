@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Citi Ghost Feedback Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="brand">
+        <div class="ghost-icon">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path
+              d="M32 4c13.2 0 22 9.88 22 23.06V60L46 52l-6 8-8-8-8 8-6-8-8 8V27.06C10 13.88 18.8 4 32 4Z"
+            ></path>
+            <circle cx="24" cy="28" r="4" class="ghost-eye"></circle>
+            <circle cx="40" cy="28" r="4" class="ghost-eye"></circle>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">Citi Ghost Feedback</div>
+          <div class="brand-subtext">Floating toolbar for rapid product feedback</div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="ghost-btn ghost-btn-outline">Docs</button>
+        <button class="ghost-btn">Launch Widget</button>
+      </div>
+    </header>
+
+    <main class="main-layout">
+      <section class="info-panel">
+        <h1>Your Citi-ready feedback co-pilot</h1>
+        <p>
+          Citi Ghost Feedback helps distributed teams capture real-time context directly inside
+          their web tools. Collect screenshots, user metadata, and structured descriptions without
+          leaving your workflow.
+        </p>
+        <ul class="feature-list">
+          <li>Floating toolbar with draggable Citi Ghost launcher.</li>
+          <li>Role-aware prompts for traders, ops, engineers, and client services.</li>
+          <li>Local-first storage with Excel audit trail and PNG screenshots.</li>
+          <li>Dark-theme friendly overlays that never obstruct key trading tiles.</li>
+        </ul>
+
+        <div class="view-controls">
+          <div class="tabs" role="tablist" aria-label="Sample Views">
+            <button class="tab active" data-view="trader">Trader View</button>
+            <button class="tab" data-view="marketplace">Internal Marketplace</button>
+            <button class="tab" data-view="client">Client Services</button>
+          </div>
+          <label class="dropdown-label">
+            Sample View
+            <select id="sampleViewSelect">
+              <option value="trader" selected>Trader View</option>
+              <option value="marketplace">Internal Marketplace</option>
+              <option value="client">Client Services</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <section class="sample-panel">
+        <div class="sample-view active" data-view="trader">
+          <div class="panel-header">
+            <h2>Trader Control Room</h2>
+            <span class="tag tag-live">Live Markets</span>
+          </div>
+          <div class="grid two-col gap-lg">
+            <div class="card">
+              <div class="card-header">
+                <span>FX Positions</span>
+                <span class="badge badge-blue">Tokyo Desk</span>
+              </div>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Pair</th>
+                    <th>Exposure</th>
+                    <th>P&amp;L</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>USD/JPY</td>
+                    <td>120M</td>
+                    <td class="text-positive">+1.8M</td>
+                  </tr>
+                  <tr>
+                    <td>EUR/USD</td>
+                    <td>75M</td>
+                    <td class="text-negative">-0.4M</td>
+                  </tr>
+                  <tr>
+                    <td>GBP/NZD</td>
+                    <td>18M</td>
+                    <td class="text-positive">+230K</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card chart-card">
+              <div class="card-header">
+                <span>Latency Heatmap</span>
+                <span class="badge badge-cyan">Last 5 min</span>
+              </div>
+              <div class="chart-placeholder">
+                <div class="chart-bar bar-1"></div>
+                <div class="chart-bar bar-2"></div>
+                <div class="chart-bar bar-3"></div>
+                <div class="chart-bar bar-4"></div>
+                <div class="chart-bar bar-5"></div>
+              </div>
+              <p class="chart-caption">Desk-level routing quality vs. benchmark SLA.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sample-view" data-view="marketplace">
+          <div class="panel-header">
+            <h2>Internal Marketplace</h2>
+            <span class="tag">Beta</span>
+          </div>
+          <div class="grid three-col gap-md">
+            <div class="card product-card">
+              <h3>Data Stream API</h3>
+              <p>Low-latency tick feed with normalized metadata and SLA guardrails.</p>
+              <button class="ghost-btn ghost-btn-small">Request Access</button>
+            </div>
+            <div class="card product-card">
+              <h3>Collateral Optimizer</h3>
+              <p>Automates cross-entity allocation with scenario planning support.</p>
+              <button class="ghost-btn ghost-btn-small">Launch Tool</button>
+            </div>
+            <div class="card product-card">
+              <h3>AI Risk Monitor</h3>
+              <p>Detects anomalous activity across internal systems in real time.</p>
+              <button class="ghost-btn ghost-btn-small ghost-btn-outline">View Docs</button>
+            </div>
+          </div>
+          <div class="card marketplace-table">
+            <div class="card-header">
+              <span>Pending Requests</span>
+              <span class="badge badge-blue">4</span>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Product</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Delta One</td>
+                  <td>Pricing Grid</td>
+                  <td><span class="status-dot status-warn"></span>Needs Info</td>
+                </tr>
+                <tr>
+                  <td>Prime Finance</td>
+                  <td>Ops Portal</td>
+                  <td><span class="status-dot status-ok"></span>Configured</td>
+                </tr>
+                <tr>
+                  <td>Innovation Lab</td>
+                  <td>Model Factory</td>
+                  <td><span class="status-dot status-pending"></span>In Review</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="sample-view" data-view="client">
+          <div class="panel-header">
+            <h2>Client Services Console</h2>
+            <span class="tag tag-live">SLA Tracker</span>
+          </div>
+          <div class="grid two-col gap-md">
+            <div class="card ticket-stream">
+              <div class="card-header">
+                <span>Active Tickets</span>
+                <span class="badge badge-cyan">Client Escalations</span>
+              </div>
+              <ul class="ticket-list">
+                <li>
+                  <div>
+                    <strong>CS-88421</strong>
+                    <div class="subtext">Latency spike on equities staging</div>
+                  </div>
+                  <span class="tag">High</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>CS-88398</strong>
+                    <div class="subtext">Report export stuck on “preparing”</div>
+                  </div>
+                  <span class="tag tag-gray">Medium</span>
+                </li>
+                <li>
+                  <div>
+                    <strong>CS-88312</strong>
+                    <div class="subtext">Client cannot reset secure PIN</div>
+                  </div>
+                  <span class="tag tag-live">Urgent</span>
+                </li>
+              </ul>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <span>Resolution Insights</span>
+              </div>
+              <div class="insights">
+                <div>
+                  <p class="insight-title">Median time to first response</p>
+                  <p class="insight-value">4m 42s</p>
+                </div>
+                <div>
+                  <p class="insight-title">Cases reopened in last 24h</p>
+                  <p class="insight-value text-negative">3</p>
+                </div>
+                <div>
+                  <p class="insight-title">Automation coverage</p>
+                  <p class="insight-value text-positive">72%</p>
+                </div>
+              </div>
+              <div class="chart-placeholder stacked">
+                <div class="stacked-bar">
+                  <span style="width: 55%"></span>
+                  <span style="width: 30%"></span>
+                  <span style="width: 15%"></span>
+                </div>
+                <p class="chart-caption">Ticket states: Auto-Resolved / Manual / Pending Triage.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script src="html2canvas.min.js"></script>
+    <script src="widget.js"></script>
+    <script>
+      const tabs = document.querySelectorAll(".tab");
+      const views = document.querySelectorAll(".sample-view");
+      const select = document.getElementById("sampleViewSelect");
+
+      function setView(target) {
+        views.forEach((view) => {
+          view.classList.toggle("active", view.dataset.view === target);
+        });
+        tabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.dataset.view === target);
+        });
+        select.value = target;
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => setView(tab.dataset.view));
+      });
+
+      select.addEventListener("change", (event) => setView(event.target.value));
+
+      const attachGhostLaunch = (api) => {
+        const launchBtn = document.querySelector(".nav-actions .ghost-btn:last-child");
+        if (launchBtn && !launchBtn.dataset.ghostAttached) {
+          launchBtn.dataset.ghostAttached = "true";
+          launchBtn.addEventListener("click", () => api.openFeedback());
+        }
+      };
+
+      if (window.citiGhostWidget) {
+        attachGhostLaunch(window.citiGhostWidget);
+      }
+
+      document.addEventListener("citiGhostWidgetReady", (event) => {
+        attachGhostLaunch(event.detail);
+      });
+    </script>
+  </body>
+</html>
