@@ -61,6 +61,62 @@
         </div>
       </section>
 
+        <!-- Feedback form integrated with backend /submit-feedback -->
+        <section class="feedback-panel">
+          <div class="card feedback-card">
+            <div class="card-header">
+              <h3>Submit Feedback (Demo)</h3>
+            </div>
+            <form id="feedbackForm">
+              <div class="form-row">
+                <label>Summary <input type="text" name="summary" id="summary" required /></label>
+                <label>Issue Type
+                  <select name="issue_type" id="issue_type">
+                    <option>Bug</option>
+                    <option>Task</option>
+                    <option>Story</option>
+                    <option>Incident</option>
+                  </select>
+                </label>
+              </div>
+              <div class="form-row">
+                <label>Description (required)</label>
+                <textarea name="description" id="description" rows="3" required></textarea>
+              </div>
+
+              <div class="form-row">
+                <label>Portfolio <input type="text" name="portfolio" id="portfolio" /></label>
+                <label>Reporter SOEID <input type="text" name="reporter_soeid" id="reporter_soeid" /></label>
+              </div>
+
+              <div class="form-row">
+                <label>Assignee SOEID <input type="text" name="assignee_soeid" id="assignee_soeid" /></label>
+                <label>Reporter <input type="text" name="reporter" id="reporter" /></label>
+              </div>
+
+              <div class="form-row">
+                <label>Planned Start <input type="date" name="planned_start" id="planned_start" /></label>
+                <label>Planned End <input type="date" name="planned_end" id="planned_end" /></label>
+              </div>
+
+              <div class="form-row">
+                <label>Parent ID <input type="text" name="parent_id" id="parent_id" /></label>
+                <label>Epic Link <input type="text" name="epic_link" id="epic_link" /></label>
+              </div>
+
+              <div class="form-row">
+                <label>Attach Screenshot (optional)
+                  <input type="file" id="screenshotFile" accept="image/*" />
+                </label>
+              </div>
+
+              <div class="form-row">
+                <button type="submit" class="ghost-btn">Submit Feedback</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
       <section class="sample-panel">
         <div class="sample-view active" data-view="trader">
           <div class="panel-header">
@@ -278,6 +334,81 @@
       document.addEventListener("citiGhostWidgetReady", (event) => {
         attachGhostLaunch(event.detail);
       });
+    </script>
+    <script>
+      // Feedback form submission: convert optional file to base64 data URL and POST JSON
+      (function () {
+        const form = document.getElementById("feedbackForm");
+        const fileInput = document.getElementById("screenshotFile");
+
+        function readFileAsDataURL(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+
+        form.addEventListener("submit", async (ev) => {
+          ev.preventDefault();
+          const summary = document.getElementById("summary").value.trim();
+          const issue_type = document.getElementById("issue_type").value;
+          const description = document.getElementById("description").value.trim();
+          if (!description) {
+            alert("Description is required");
+            return;
+          }
+
+          const payload = {
+            summary,
+            issue_type,
+            description,
+            portfolio: document.getElementById("portfolio").value.trim(),
+            reporter_soeid: document.getElementById("reporter_soeid").value.trim(),
+            assignee_soeid: document.getElementById("assignee_soeid").value.trim(),
+            reporter: document.getElementById("reporter").value.trim(),
+            planned_start: document.getElementById("planned_start").value || null,
+            planned_end: document.getElementById("planned_end").value || null,
+            parent_id: document.getElementById("parent_id").value.trim(),
+            epic_link: document.getElementById("epic_link").value.trim(),
+            url: location.href,
+            userAgent: navigator.userAgent,
+          };
+
+          const file = fileInput.files && fileInput.files[0];
+          if (file) {
+            try {
+              const dataUrl = await readFileAsDataURL(file);
+              payload.screenshot = dataUrl;
+            } catch (err) {
+              console.error("Failed reading file:", err);
+              alert("Failed to read screenshot file");
+              return;
+            }
+          }
+
+          console.log("Submitting payload:", payload);
+
+          try {
+            const res = await fetch("/submit-feedback", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const body = await res.json();
+            if (res.ok) {
+              alert(`Feedback submitted — ticket id: ${body.ticket_id}`);
+              form.reset();
+            } else {
+              alert(`Error: ${body.message || JSON.stringify(body)}`);
+            }
+          } catch (err) {
+            console.error(err);
+            alert("Network or server error when submitting feedback");
+          }
+        });
+      })();
     </script>
   </body>
 </html>
