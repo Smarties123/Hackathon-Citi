@@ -1,15 +1,15 @@
 import base64
+import csv
 import logging
 import secrets
 from datetime import datetime
 from pathlib import Path
+from typing import Optional
 
 from flask import Flask, jsonify, request, send_from_directory
-from openpyxl import Workbook, load_workbook
-
 BASE_DIR = Path(__file__).resolve().parent
-SCREENSHOT_DIR = BASE_DIR / "screenshots"
-TICKETS_FILE = BASE_DIR / "tickets.xlsx"
+EVIDENCE_DIR = BASE_DIR / "evidence"
+CSV_FILE = BASE_DIR / "feedback_storage.csv"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("citi_ghost_feedback")
@@ -19,105 +19,105 @@ app = Flask(__name__)
 
 def ensure_storage():
     """Ensure screenshots directory and workbook exist before serving requests."""
-    SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
-    if not TICKETS_FILE.exists():
-        logger.info("tickets.xlsx not found. Creating a new workbook.")
-        wb = Workbook()
-        sheet = wb.active
-        sheet.title = "Tickets"
-        sheet.append(
-            [
-                "Ticket ID",
-                "Role",
-                "URL",
-                "Description",
-                "Screenshot Path",
-                "User Agent",
-                "Timestamp",
-                "Issue Type",
-                "Priority",
-                "Category",
-                "Archive Status",
-            ]
-        )
-        wb.save(TICKETS_FILE)
+    EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
+    # Create CSV storage with header if not present
+    if not CSV_FILE.exists():
+        logger.info("feedback_storage.csv not found. Creating a new CSV with header.")
+        header = [
+            "Unique ID",
+            "Summary",
+            "Issue Type",
+            "Description",
+            "Portfolio",
+            "Reporter SOEID",
+            "Assignee SOEID",
+            "Reporter",
+            "Planned Start",
+            "Planned End",
+            "Parent ID",
+            "Epic Link",
+            "Evidence Path",
+            "Timestamp",
+        ]
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
 
 
 ensure_storage()
 
 
-def load_sheet():
-    wb = load_workbook(TICKETS_FILE)
-    return wb, wb.active
-
-
 def save_screenshot(data_url: str) -> str:
-    """Save a base64 screenshot to disk and return the relative path."""
+    """Save a base64 screenshot to disk and return the relative path (relative to BASE_DIR)."""
     try:
         header, encoded = data_url.split(",", 1)
     except ValueError:
         raise ValueError("Invalid screenshot payload")
 
     filename = f"{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}_{secrets.token_hex(4)}.png"
-    path = SCREENSHOT_DIR / filename
+    path = EVIDENCE_DIR / filename
     image_bytes = base64.b64decode(encoded)
     with open(path, "wb") as f:
         f.write(image_bytes)
-    logger.info("Saved screenshot to %s", path)
+    logger.info("Saved evidence to %s", path)
     return str(path.relative_to(BASE_DIR))
 
 
-def append_ticket(role, url, description, screenshot_path, user_agent, issue_type="", priority="", category=""):
-    wb, sheet = load_sheet()
-    ticket_id = sheet.max_row  # header is row 1, so next row index == ticket id
+def _next_unique_id() -> int:
+    """Determine next numeric Unique ID by reading existing CSV. Starts at 1."""
+    try:
+        with open(CSV_FILE, newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            max_id = 0
+            for row in reader:
+                try:
+                    uid = int(row.get("Unique ID", "0") or 0)
+                    if uid > max_id:
+                        max_id = uid
+                except ValueError:
+                    continue
+            return max_id + 1
+    except FileNotFoundError:
+        return 1
+
+
+def append_feedback(
+    summary: str,
+    issue_type: str = "Task",
+    description: Optional[str] = None,
+    portfolio: Optional[str] = None,
+    reporter_soeid: Optional[str] = None,
+    assignee_soeid: Optional[str] = None,
+    reporter: Optional[str] = None,
+    planned_start: Optional[str] = None,
+    planned_end: Optional[str] = None,
+    parent_id: Optional[str] = None,
+    epic_link: Optional[str] = None,
+    evidence_path: Optional[str] = None,
+):
+    unique_id = _next_unique_id()
     timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
-    
-    # Add metadata to description if available
-    full_description = description
-    if issue_type or priority or category:
-        metadata = []
-        if issue_type:
-            metadata.append(f"[{issue_type}]")
-        if priority:
-            metadata.append(f"Priority: {priority}")
-        if category:
-            metadata.append(f"Tag: {category}")
-        full_description = f"{' '.join(metadata)}\n\n{description}"
-    
-    # Ensure header has all columns
-    headers = [cell.value for cell in sheet[1]]
-    if len(headers) < 11:
-        # Add missing header columns
-        while len(headers) < 11:
-            col_idx = len(headers) + 1
-            if col_idx == 8:
-                sheet.cell(row=1, column=col_idx, value="Issue Type")
-            elif col_idx == 9:
-                sheet.cell(row=1, column=col_idx, value="Priority")
-            elif col_idx == 10:
-                sheet.cell(row=1, column=col_idx, value="Category")
-            elif col_idx == 11:
-                sheet.cell(row=1, column=col_idx, value="Archive Status")
-            headers.append(sheet.cell(row=1, column=col_idx).value)
-    
-    sheet.append(
-        [
-            ticket_id,
-            role,
-            url,
-            full_description,
-            screenshot_path or "",
-            user_agent,
-            timestamp,
-            issue_type or "",
-            priority or "",
-            category or "",
-            "active",  # Default archive status
-        ]
-    )
-    wb.save(TICKETS_FILE)
-    logger.info("Stored ticket %s", ticket_id)
-    return ticket_id, timestamp
+    row = [
+        unique_id,
+        summary or "",
+        issue_type or "",
+        description or "",
+        portfolio or "",
+        reporter_soeid or "",
+        assignee_soeid or "",
+        reporter or "",
+        planned_start or "",
+        planned_end or "",
+        parent_id or "",
+        epic_link or "",
+        evidence_path or "",
+        timestamp,
+    ]
+    with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(row)
+    logger.info("Appended feedback %s", unique_id)
+    return unique_id, timestamp
 
 
 @app.after_request
@@ -177,8 +177,18 @@ def submit_feedback():
         return ("", 204)
 
     payload = request.get_json(force=True, silent=True) or {}
-    role = payload.get("role", "").strip() or "Client"
+    # Map incoming payload to our CSV-backed append_feedback function
+    summary = payload.get("summary", "").strip() or payload.get("description", "").strip()
+    issue_type = payload.get("issue_type", "Task")
     description = payload.get("description", "").strip()
+    portfolio = payload.get("portfolio")
+    reporter_soeid = payload.get("reporter_soeid")
+    assignee_soeid = payload.get("assignee_soeid")
+    reporter = payload.get("reporter")
+    planned_start = payload.get("planned_start")
+    planned_end = payload.get("planned_end")
+    parent_id = payload.get("parent_id")
+    epic_link = payload.get("epic_link")
     url = payload.get("url", "").strip()
     user_agent = payload.get("userAgent", "Unknown")
     screenshot_data = payload.get("screenshot")
@@ -186,14 +196,14 @@ def submit_feedback():
     priority = payload.get("priority", "").strip()
     category = payload.get("category", "").strip()
 
-    if not description:
-        logger.warning("Description missing from payload")
-        return jsonify({"status": "error", "message": "Description is required"}), 400
+    if not description and not summary:
+        logger.warning("Description or summary missing from payload")
+        return jsonify({"status": "error", "message": "Description or summary is required"}), 400
 
-    screenshot_path = ""
+    evidence_path = ""
     if screenshot_data:
         try:
-            screenshot_path = save_screenshot(screenshot_data)
+            evidence_path = save_screenshot(screenshot_data)
         except Exception as exc:  # broad to ensure request still stored
             logger.error("Failed to save screenshot: %s", exc)
             return (
@@ -202,18 +212,22 @@ def submit_feedback():
             )
 
     try:
-        ticket_id, timestamp = append_ticket(
-            role=role,
-            url=url or request.headers.get("Referer", ""),
-            description=description,
-            screenshot_path=screenshot_path,
-            user_agent=user_agent,
+        ticket_id, timestamp = append_feedback(
+            summary=summary,
             issue_type=issue_type,
-            priority=priority,
-            category=category,
+            description=description,
+            portfolio=portfolio,
+            reporter_soeid=reporter_soeid,
+            assignee_soeid=assignee_soeid,
+            reporter=reporter,
+            planned_start=planned_start,
+            planned_end=planned_end,
+            parent_id=parent_id,
+            epic_link=epic_link,
+            evidence_path=evidence_path,
         )
     except Exception as exc:
-        logger.exception("Unable to append ticket: %s", exc)
+        logger.exception("Unable to append feedback: %s", exc)
         return jsonify({"status": "error", "message": "Failed to store feedback"}), 500
 
     return jsonify({"status": "success", "ticket_id": ticket_id, "timestamp": timestamp})
