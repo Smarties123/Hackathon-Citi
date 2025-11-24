@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Citi Ghost Feedback Demo</title>
+    <title>Citi Snap - Feedback Tool</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -19,12 +19,31 @@
           </svg>
         </div>
         <div>
-          <div class="brand-title">Citi Ghost Feedback</div>
+          <div class="brand-title">Citi Snap</div>
           <div class="brand-subtext">Floating toolbar for rapid product feedback</div>
         </div>
       </div>
       <div class="nav-actions">
         <button class="ghost-btn ghost-btn-outline">Docs</button>
+        <button class="shortcut-btn header-search-btn" data-action="search" title="Search Feedback">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <path d="M21 21l-4.35-4.35"></path>
+          </svg>
+        </button>
+        <button class="shortcut-btn header-notification-btn" data-action="notifications" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <span class="shortcut-badge">0</span>
+        </button>
+        <button class="shortcut-btn header-settings-btn" data-action="settings" title="Settings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </button>
         <button class="ghost-btn">Launch Widget</button>
       </div>
     </header>
@@ -33,12 +52,12 @@
       <section class="info-panel">
         <h1>Your Citi-ready feedback co-pilot</h1>
         <p>
-          Citi Ghost Feedback helps distributed teams capture real-time context directly inside
+          Citi Snap helps distributed teams capture real-time context directly inside
           their web tools. Collect screenshots, user metadata, and structured descriptions without
           leaving your workflow.
         </p>
         <ul class="feature-list">
-          <li>Floating toolbar with draggable Citi Ghost launcher.</li>
+          <li>Floating toolbar with draggable Citi Snap launcher.</li>
           <li>Role-aware prompts for traders, ops, engineers, and client services.</li>
           <li>Local-first storage with Excel audit trail and PNG screenshots.</li>
           <li>Dark-theme friendly overlays that never obstruct key trading tiles.</li>
@@ -59,6 +78,602 @@
             </select>
           </label>
         </div>
+
+        <div class="shortcuts-section">
+          <h3 class="shortcuts-title">Shortcuts</h3>
+          
+          <div class="shortcut-category">
+            <div class="shortcuts-grid">
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="feedback" title="View Feedback">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
+                <span class="shortcut-label">View Feedback</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="templates" title="Feedback Templates">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Template</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="shortcut-category">
+            <h4 class="category-title">Media & Files</h4>
+            <div class="shortcuts-grid">
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="gallery" title="Screenshot Gallery">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Screenshots</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="export" title="Export Data">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Export</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="archive" title="Archive">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="21 8 21 21 3 21 3 8"></polyline>
+                    <rect x="1" y="3" width="22" height="5"></rect>
+                    <line x1="10" y1="12" x2="14" y2="12"></line>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Archive</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="shortcut-category">
+            <h4 class="category-title">Analytics & Insights</h4>
+            <div class="shortcuts-grid">
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="analytics" title="Analytics">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Analytics</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="activity" title="Activity Log">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Activity</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="reports" title="Reports">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Reports</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="shortcut-category">
+            <h4 class="category-title">Support</h4>
+            <div class="shortcuts-grid">
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="help" title="Help & Docs">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Help & Docs</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="faq" title="FAQ">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  </svg>
+                </button>
+                <span class="shortcut-label">FAQ</span>
+              </div>
+              <div class="shortcut-item">
+                <button class="shortcut-btn" data-action="contact" title="Contact Support">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                  </svg>
+                </button>
+                <span class="shortcut-label">Contact</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="features-section">
+          <div class="feature-card" id="feedbackCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Recent Feedback</h3>
+              <button class="close-feature" data-close="feedbackCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="feedback-stats">
+                <div class="stat-item">
+                  <span class="stat-value" id="totalFeedback">0</span>
+                  <span class="stat-label">Total Tickets</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-value" id="pendingFeedback">0</span>
+                  <span class="stat-label">Pending</span>
+                </div>
+              </div>
+              <div class="feedback-list" id="feedbackList">
+                <p class="empty-state">No feedback submitted yet. Use the Citi Snap widget to submit feedback!</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="analyticsCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Analytics Dashboard</h3>
+              <button class="close-feature" data-close="analyticsCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="analytics-grid">
+                <div class="analytics-item">
+                  <span class="analytics-label">Feedback by Role</span>
+                  <div class="analytics-bar">
+                    <div class="bar-fill" style="width: 45%">Client (45%)</div>
+                  </div>
+                  <div class="analytics-bar">
+                    <div class="bar-fill" style="width: 30%">Trader (30%)</div>
+                  </div>
+                  <div class="analytics-bar">
+                    <div class="bar-fill" style="width: 25%">Ops (25%)</div>
+                  </div>
+                </div>
+                <div class="analytics-item">
+                  <span class="analytics-label">This Week</span>
+                  <span class="analytics-value">12 submissions</span>
+                </div>
+                <div class="analytics-item">
+                  <span class="analytics-label">Avg Response Time</span>
+                  <span class="analytics-value">2.4 hours</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="galleryCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Screenshot Gallery</h3>
+              <button class="close-feature" data-close="galleryCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="gallery-grid" id="galleryGrid">
+                <p class="empty-state">No screenshots available yet.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="exportCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Export Data</h3>
+              <button class="close-feature" data-close="exportCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <p>Export your feedback data in various formats:</p>
+              <div class="export-options">
+                <button class="export-btn" data-format="excel">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  Export to Excel
+                </button>
+                <button class="export-btn" data-format="csv">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  Export to CSV
+                </button>
+                <button class="export-btn" data-format="json">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                  Export to JSON
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="notificationsCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Notifications</h3>
+              <button class="close-feature" data-close="notificationsCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="notifications-list" id="notificationsList">
+                <div class="notification-item">
+                  <div class="notification-icon">🔔</div>
+                  <div class="notification-content">
+                    <strong>New feedback submitted</strong>
+                    <p>Trader role - 2 minutes ago</p>
+                  </div>
+                </div>
+                <div class="notification-item">
+                  <div class="notification-icon">✅</div>
+                  <div class="notification-content">
+                    <strong>Ticket resolved</strong>
+                    <p>CS-88421 - 1 hour ago</p>
+                  </div>
+                </div>
+                <div class="notification-item">
+                  <div class="notification-icon">📊</div>
+                  <div class="notification-content">
+                    <strong>Weekly report ready</strong>
+                    <p>Analytics updated - 3 hours ago</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="searchCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Search Feedback</h3>
+              <button class="close-feature" data-close="searchCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <input type="text" class="search-input" placeholder="Search by description, role, or ticket ID..." id="searchInput">
+              <div class="search-filters">
+                <select id="roleFilter" class="filter-select">
+                  <option value="">All Roles</option>
+                  <option value="Client">Client</option>
+                  <option value="Trader">Trader</option>
+                  <option value="Ops">Ops</option>
+                  <option value="Engineer">Engineer</option>
+                </select>
+                <select id="dateFilter" class="filter-select">
+                  <option value="">All Time</option>
+                  <option value="today">Today</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+              <div class="search-results" id="searchResults">
+                <p class="empty-state">Enter a search term to find feedback.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="templatesCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Feedback Templates</h3>
+              <button class="close-feature" data-close="templatesCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="templates-list">
+                <div class="template-item">
+                  <strong>Bug Report</strong>
+                  <p>Report a bug or issue with detailed steps to reproduce.</p>
+                  <button class="template-use-btn">Use Template</button>
+                </div>
+                <div class="template-item">
+                  <strong>Feature Request</strong>
+                  <p>Suggest a new feature or improvement.</p>
+                  <button class="template-use-btn">Use Template</button>
+                </div>
+                <div class="template-item">
+                  <strong>Performance Issue</strong>
+                  <p>Report performance problems or latency issues.</p>
+                  <button class="template-use-btn">Use Template</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="activityCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Activity Log</h3>
+              <button class="close-feature" data-close="activityCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="activity-list" id="activityList">
+                <div class="activity-item">
+                  <span class="activity-time">2m ago</span>
+                  <span class="activity-text">New feedback submitted by Trader</span>
+                </div>
+                <div class="activity-item">
+                  <span class="activity-time">1h ago</span>
+                  <span class="activity-text">Ticket CS-88421 resolved</span>
+                </div>
+                <div class="activity-item">
+                  <span class="activity-time">3h ago</span>
+                  <span class="activity-text">Data exported to Excel</span>
+                </div>
+                <div class="activity-item">
+                  <span class="activity-time">5h ago</span>
+                  <span class="activity-text">New feedback submitted by Client</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="settingsCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Settings</h3>
+              <button class="close-feature" data-close="settingsCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="settings-group">
+                <label class="settings-label">
+                  <input type="checkbox" checked> Enable notifications
+                </label>
+                <label class="settings-label">
+                  <input type="checkbox" checked> Auto-capture screenshots
+                </label>
+                <label class="settings-label">
+                  <input type="checkbox"> Dark mode (always on)
+                </label>
+              </div>
+              <div class="settings-group">
+                <label class="settings-label">Default Role</label>
+                <select class="settings-select">
+                  <option value="Client">Client</option>
+                  <option value="Product Support">Product Support</option>
+                  <option value="Product Management">Product Management</option>
+                  <option value="Engineering">Engineering</option>
+                </select>
+              </div>
+              <button class="settings-save-btn">Save Settings</button>
+            </div>
+          </div>
+
+          <div class="feature-card" id="helpCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Help & Documentation</h3>
+              <button class="close-feature" data-close="helpCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="help-links">
+                <a href="#" class="help-link">Getting Started Guide</a>
+                <a href="#" class="help-link">API Documentation</a>
+                <a href="#" class="help-link">Keyboard Shortcuts</a>
+                <a href="#" class="help-link">Troubleshooting</a>
+                <a href="#" class="help-link">Contact Support</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="archiveCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Archive</h3>
+              <button class="close-feature" data-close="archiveCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <p>View and manage archived feedback and tickets. Use filters to find specific items.</p>
+              <div class="archive-filters">
+                <select class="filter-select" id="archiveStatusFilter">
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="archived">Archived</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="closed">Closed</option>
+                </select>
+                <select class="filter-select" id="archiveDateFilter">
+                  <option value="">All Time</option>
+                  <option value="week">Last Week</option>
+                  <option value="month">Last Month</option>
+                  <option value="quarter">Last Quarter</option>
+                  <option value="year">Last Year</option>
+                </select>
+              </div>
+              <div class="archive-list" id="archiveList">
+                <p class="empty-state">Loading archive...</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="reportsCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Reports</h3>
+              <button class="close-feature" data-close="reportsCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <p>Generate and view detailed reports on feedback trends and metrics.</p>
+              <div class="reports-options">
+                <div class="report-type">
+                  <h4>Weekly Report</h4>
+                  <p>Summary of feedback submitted in the last 7 days</p>
+                  <button class="export-btn" data-report="weekly">Generate Weekly Report</button>
+                </div>
+                <div class="report-type">
+                  <h4>Monthly Report</h4>
+                  <p>Comprehensive analysis of the past month's feedback</p>
+                  <button class="export-btn" data-report="monthly">Generate Monthly Report</button>
+                </div>
+                <div class="report-type">
+                  <h4>Custom Report</h4>
+                  <p>Create a custom report with specific date ranges and filters</p>
+                  <button class="export-btn" data-report="custom">Create Custom Report</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="faqCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Frequently Asked Questions</h3>
+              <button class="close-feature" data-close="faqCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <div class="faq-list">
+                <div class="faq-item">
+                  <h4>How do I submit feedback?</h4>
+                  <p>Click the "Citi Snap" button in the bottom right corner, select your role, and click "Give Feedback". Fill out the form and submit.</p>
+                </div>
+                <div class="faq-item">
+                  <h4>Can I attach screenshots?</h4>
+                  <p>Yes! Click "Capture Screenshot" in the feedback form to automatically capture the current page.</p>
+                </div>
+                <div class="faq-item">
+                  <h4>How do I search for previous feedback?</h4>
+                  <p>Use the Search shortcut to find feedback by description, role, ticket ID, or date range.</p>
+                </div>
+                <div class="faq-item">
+                  <h4>Where is my feedback stored?</h4>
+                  <p>All feedback is stored locally in an Excel file (tickets.xlsx) and screenshots are saved in the screenshots folder.</p>
+                </div>
+                <div class="faq-item">
+                  <h4>Can I export my feedback data?</h4>
+                  <p>Yes! Use the Export shortcut to download your feedback data in CSV or JSON format.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="feature-card" id="contactCard" style="display: none;">
+            <div class="feature-card-header">
+              <h3>Contact Support</h3>
+              <button class="close-feature" data-close="contactCard">&times;</button>
+            </div>
+            <div class="feature-card-content">
+              <p>Need help? Reach out to our support team.</p>
+              <div class="contact-options">
+                <div class="contact-item">
+                  <strong>Email Support</strong>
+                  <p>support@citighost.com</p>
+                </div>
+                <div class="contact-item">
+                  <strong>Internal Slack</strong>
+                  <p>#citi-ghost-feedback</p>
+                </div>
+                <div class="contact-item">
+                  <strong>Documentation</strong>
+                  <p><a href="#" class="help-link">View full documentation</a></p>
+                </div>
+              </div>
+              <div class="contact-form">
+                <h4>Send us a message</h4>
+                <textarea class="search-input" placeholder="Describe your issue or question..." rows="4"></textarea>
+                <button class="settings-save-btn">Send Message</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Custom Report Modal -->
+        <div class="custom-report-modal" id="customReportModal" style="display: none;">
+          <div class="custom-report-overlay"></div>
+          <div class="custom-report-dialog">
+            <div class="custom-report-header">
+              <h3>Create Custom Report</h3>
+              <button class="close-custom-report" id="closeCustomReport">&times;</button>
+            </div>
+            <div class="custom-report-body">
+              <div class="form-field">
+                <label>Report Name</label>
+                <input type="text" id="reportName" class="ghost-select" placeholder="My Custom Report" value="Custom Report">
+              </div>
+
+              <div class="form-row">
+                <div class="form-field">
+                  <label>Start Date</label>
+                  <input type="date" id="reportStartDate" class="ghost-select">
+                </div>
+                <div class="form-field">
+                  <label>End Date</label>
+                  <input type="date" id="reportEndDate" class="ghost-select">
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label>Filter by Role</label>
+                <select id="reportRoleFilter" class="ghost-select" multiple>
+                  <option value="Client">Client</option>
+                  <option value="Product Support">Product Support</option>
+                  <option value="Product Management">Product Management</option>
+                  <option value="Engineering">Engineering</option>
+                </select>
+                <small class="field-hint">Hold Ctrl/Cmd to select multiple roles</small>
+              </div>
+
+              <div class="form-field">
+                <label>Filter by Issue Type</label>
+                <select id="reportIssueTypeFilter" class="ghost-select" multiple>
+                  <option value="Bug">Bug</option>
+                  <option value="Feature Request">Feature Request</option>
+                  <option value="Performance">Performance</option>
+                  <option value="UI/UX">UI/UX</option>
+                  <option value="Security">Security</option>
+                  <option value="Data Issue">Data Issue</option>
+                  <option value="Integration">Integration</option>
+                  <option value="Other">Other</option>
+                </select>
+                <small class="field-hint">Hold Ctrl/Cmd to select multiple types</small>
+              </div>
+
+              <div class="form-field">
+                <label>Filter by Priority</label>
+                <select id="reportPriorityFilter" class="ghost-select" multiple>
+                  <option value="Low">Low</option>
+                  <option value="Medium">Medium</option>
+                  <option value="High">High</option>
+                  <option value="Critical">Critical</option>
+                </select>
+                <small class="field-hint">Hold Ctrl/Cmd to select multiple priorities</small>
+              </div>
+
+              <div class="form-field">
+                <label>Include Screenshots</label>
+                <label class="settings-label" style="flex-direction: row; align-items: center; gap: 0.5rem;">
+                  <input type="checkbox" id="includeScreenshots" checked>
+                  <span>Include screenshot references in report</span>
+                </label>
+              </div>
+
+              <div class="form-field">
+                <label>Report Format</label>
+                <select id="reportFormat" class="ghost-select">
+                  <option value="txt">Text File (.txt)</option>
+                  <option value="csv">CSV (.csv)</option>
+                  <option value="json">JSON (.json)</option>
+                </select>
+              </div>
+            </div>
+            <div class="custom-report-footer">
+              <button class="ghost-btn ghost-btn-outline" id="cancelCustomReport">Cancel</button>
+              <button class="ghost-btn" id="generateCustomReport">Generate Report</button>
+            </div>
+          </div>
+        </div>
+
       </section>
 
       <section class="sample-panel">
@@ -278,6 +893,918 @@
       document.addEventListener("citiGhostWidgetReady", (event) => {
         attachGhostLaunch(event.detail);
       });
+
+      // Shortcuts functionality
+      const shortcutButtons = document.querySelectorAll(".shortcut-btn, [data-action]");
+      const featureCards = document.querySelectorAll(".feature-card");
+      const closeButtons = document.querySelectorAll(".close-feature");
+      
+      // Also handle clicks on shortcut-item wrapper
+      document.querySelectorAll(".shortcut-item").forEach((item) => {
+        const btn = item.querySelector(".shortcut-btn");
+        if (btn) {
+          item.addEventListener("click", (e) => {
+            if (e.target !== btn && !btn.contains(e.target)) {
+              btn.click();
+            }
+          });
+        }
+      });
+
+      shortcutButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const action = btn.dataset.action;
+          const cardId = action + "Card";
+          const card = document.getElementById(cardId);
+
+          if (card) {
+            // Hide all other cards
+            featureCards.forEach((c) => (c.style.display = "none"));
+            // Show selected card
+            card.style.display = "block";
+            // Scroll to card
+            card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        });
+      });
+
+      closeButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const cardId = btn.dataset.close;
+          const card = document.getElementById(cardId);
+          if (card) {
+            card.style.display = "none";
+          }
+        });
+      });
+
+      // Backend API URL
+      const API_BASE = "http://127.0.0.1:5000";
+
+      // Load feedback data from backend
+      async function loadFeedback() {
+        try {
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          const result = await response.json();
+          
+          if (result.status === "success") {
+            const feedbackData = result.tickets || [];
+            updateFeedbackDisplay(feedbackData);
+            updateAnalytics(feedbackData);
+            updateNotifications(feedbackData);
+            updateGallery(feedbackData);
+            updateActivityLog(feedbackData);
+            updateNotificationBadge(feedbackData);
+            return feedbackData;
+          } else {
+            throw new Error(result.message || "Failed to load feedback");
+          }
+        } catch (error) {
+          console.error("Error loading feedback:", error);
+          // Show empty state on error
+          updateFeedbackDisplay([]);
+          return [];
+        }
+      }
+
+      function updateFeedbackDisplay(data) {
+        // Filter to only show active items
+        const activeData = data.filter(item => {
+          const status = item.archive_status || "active";
+          return status === "active";
+        });
+        
+        const totalFeedback = activeData.length;
+        // All feedback is considered pending unless marked otherwise
+        const pendingFeedback = totalFeedback;
+
+        document.getElementById("totalFeedback").textContent = totalFeedback;
+        document.getElementById("pendingFeedback").textContent = pendingFeedback;
+
+        const feedbackList = document.getElementById("feedbackList");
+        if (activeData.length === 0) {
+          feedbackList.innerHTML = '<p class="empty-state">No active feedback. Check the Archive to see resolved or archived items.</p>';
+        } else {
+          feedbackList.innerHTML = activeData
+            .slice(0, 5) // Show 5 most recent (already reversed from backend)
+            .map((item) => {
+              const date = new Date(item.timestamp || Date.now());
+              return `
+                <div class="feedback-item">
+                  <div class="feedback-item-header">
+                    <span class="feedback-role">${item.role || "Client"}</span>
+                    <span class="feedback-time">${formatDate(date)}</span>
+                  </div>
+                  <div class="feedback-description">${item.description || "No description"}</div>
+                  ${item.ticket_id ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">Ticket #${item.ticket_id}</div>` : ""}
+                  <div class="feedback-item-actions" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
+                    <button class="archive-action-btn archive-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'archived')" title="Archive this item" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">📦 Archive</button>
+                    <button class="archive-action-btn resolve-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'resolved')" title="Mark as resolved" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">✓ Resolve</button>
+                  </div>
+                </div>
+              `;
+            })
+            .join("");
+        }
+      }
+
+      function updateAnalytics(data) {
+        // Calculate role distribution
+        const roleCounts = {};
+        data.forEach((item) => {
+          const role = item.role || "Client";
+          roleCounts[role] = (roleCounts[role] || 0) + 1;
+        });
+
+        const total = data.length;
+        const roles = Object.keys(roleCounts);
+        
+        // Update analytics display
+        const analyticsGrid = document.querySelector("#analyticsCard .analytics-grid");
+        if (analyticsGrid && total > 0) {
+          const roleBars = roles.map(role => {
+            const count = roleCounts[role];
+            const percentage = Math.round((count / total) * 100);
+            return `
+              <div class="analytics-bar">
+                <div class="bar-fill" style="width: ${percentage}%">${role} (${percentage}%)</div>
+              </div>
+            `;
+          }).join("");
+
+          analyticsGrid.innerHTML = `
+            <div class="analytics-item">
+              <span class="analytics-label">Feedback by Role</span>
+              ${roleBars || "<p class='empty-state'>No data yet</p>"}
+            </div>
+            <div class="analytics-item">
+              <span class="analytics-label">This Week</span>
+              <span class="analytics-value">${getThisWeekCount(data)} submissions</span>
+            </div>
+            <div class="analytics-item">
+              <span class="analytics-label">Total Submissions</span>
+              <span class="analytics-value">${total}</span>
+            </div>
+          `;
+        }
+      }
+
+      function updateNotifications(data) {
+        const notificationsList = document.getElementById("notificationsList");
+        if (!notificationsList) return;
+
+        // Get recent submissions (last 3)
+        const recent = data.slice(0, 3);
+        
+        if (recent.length === 0) {
+          notificationsList.innerHTML = '<p class="empty-state">No notifications yet.</p>';
+        } else {
+          notificationsList.innerHTML = recent.map((item) => {
+            const date = new Date(item.timestamp || Date.now());
+            const timeAgo = getTimeAgo(date);
+            return `
+              <div class="notification-item">
+                <div class="notification-icon">🔔</div>
+                <div class="notification-content">
+                  <strong>New feedback submitted</strong>
+                  <p>${item.role || "Client"} - ${timeAgo}</p>
+                </div>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      function updateGallery(data) {
+        const galleryGrid = document.getElementById("galleryGrid");
+        if (!galleryGrid) return;
+
+        // Filter items with screenshots
+        const withScreenshots = data.filter(item => item.screenshot_path);
+        
+        if (withScreenshots.length === 0) {
+          galleryGrid.innerHTML = '<p class="empty-state">No screenshots available yet.</p>';
+        } else {
+          galleryGrid.innerHTML = withScreenshots.slice(0, 12).map((item) => {
+            // Screenshot path is relative to backend, need to construct full URL
+            let screenshotUrl;
+            if (item.screenshot_path.startsWith('http')) {
+              screenshotUrl = item.screenshot_path;
+            } else if (item.screenshot_path.startsWith('screenshots/')) {
+              screenshotUrl = `${API_BASE}/${item.screenshot_path}`;
+            } else {
+              screenshotUrl = `${API_BASE}/screenshots/${item.screenshot_path.split('/').pop()}`;
+            }
+            
+            return `
+              <div class="gallery-item" onclick="window.open('${screenshotUrl}', '_blank')">
+                <img src="${screenshotUrl}" alt="Screenshot for ticket ${item.ticket_id}" onerror="this.style.display='none'">
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      function updateActivityLog(data) {
+        const activityList = document.getElementById("activityList");
+        if (!activityList) return;
+
+        const recent = data.slice(0, 10);
+        
+        if (recent.length === 0) {
+          activityList.innerHTML = '<p class="empty-state">No activity yet.</p>';
+        } else {
+          activityList.innerHTML = recent.map((item) => {
+            const date = new Date(item.timestamp || Date.now());
+            const timeAgo = getTimeAgo(date);
+            return `
+              <div class="activity-item">
+                <span class="activity-time">${timeAgo}</span>
+                <span class="activity-text">Feedback submitted by ${item.role || "Client"} - Ticket #${item.ticket_id || "N/A"}</span>
+              </div>
+            `;
+          }).join("");
+        }
+      }
+
+      function updateNotificationBadge(data) {
+        const badge = document.querySelector("[data-action='notifications'] .shortcut-badge");
+        if (badge) {
+          const recentCount = data.filter(item => {
+            const date = new Date(item.timestamp || Date.now());
+            const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+            return date > dayAgo;
+          }).length;
+          
+          if (recentCount > 0) {
+            badge.textContent = recentCount > 9 ? "9+" : recentCount;
+            badge.style.display = "flex";
+          } else {
+            badge.style.display = "none";
+          }
+        }
+      }
+
+      function getThisWeekCount(data) {
+        const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+        return data.filter(item => {
+          const date = new Date(item.timestamp || 0);
+          return date > weekAgo;
+        }).length;
+      }
+
+      function formatDate(date) {
+        return date.toLocaleDateString() + " " + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function getTimeAgo(date) {
+        const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        const days = Math.floor(hours / 24);
+        return `${days}d ago`;
+      }
+
+      // Export functionality
+      document.querySelectorAll(".export-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const format = btn.dataset.format;
+          try {
+            // Fetch real data from backend
+            const response = await fetch(`${API_BASE}/get-feedback`);
+            const result = await response.json();
+            const feedbackData = result.status === "success" ? (result.tickets || []) : [];
+            
+            let content, mimeType, filename;
+
+            if (format === "json") {
+              content = JSON.stringify(feedbackData, null, 2);
+              mimeType = "application/json";
+              filename = "feedback-export.json";
+            } else if (format === "csv") {
+              const headers = ["Ticket ID", "Role", "URL", "Description", "Timestamp"];
+              const rows = feedbackData.map((item) => [
+                item.ticket_id || "",
+                item.role || "",
+                item.url || "",
+                (item.description || "").replace(/"/g, '""'),
+                item.timestamp || "",
+              ]);
+              content = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(",")).join("\n");
+              mimeType = "text/csv";
+              filename = "feedback-export.csv";
+            } else {
+              // Excel simulation - would need a library in production
+              alert("Excel export would require server-side processing. CSV export is available.");
+              return;
+            }
+
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+          } catch (error) {
+            alert("Error exporting data: " + error.message);
+          }
+        });
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById("searchInput");
+      const roleFilter = document.getElementById("roleFilter");
+      const dateFilter = document.getElementById("dateFilter");
+      const searchResults = document.getElementById("searchResults");
+
+      async function performSearch() {
+        const query = searchInput.value.toLowerCase();
+        const role = roleFilter.value;
+        const date = dateFilter.value;
+
+        try {
+          // Fetch real data from backend
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          const result = await response.json();
+          const feedbackData = result.status === "success" ? (result.tickets || []) : [];
+          
+          let filtered = feedbackData;
+
+          if (query) {
+            filtered = filtered.filter(
+              (item) =>
+                (item.description || "").toLowerCase().includes(query) ||
+                (item.role || "").toLowerCase().includes(query) ||
+                (item.ticket_id || "").toString().includes(query)
+            );
+          }
+
+          if (role) {
+            filtered = filtered.filter((item) => (item.role || "") === role);
+          }
+
+          if (date) {
+            const now = new Date();
+            filtered = filtered.filter((item) => {
+              const itemDate = new Date(item.timestamp || 0);
+              if (date === "today") {
+                return itemDate.toDateString() === now.toDateString();
+              } else if (date === "week") {
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                return itemDate >= weekAgo;
+              } else if (date === "month") {
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                return itemDate >= monthAgo;
+              }
+              return true;
+            });
+          }
+
+          if (filtered.length === 0) {
+            searchResults.innerHTML = '<p class="empty-state">No results found.</p>';
+          } else {
+            searchResults.innerHTML = filtered
+              .map((item) => {
+                const date = new Date(item.timestamp || Date.now());
+                return `
+                  <div class="feedback-item">
+                    <div class="feedback-item-header">
+                      <span class="feedback-role">${item.role || "Client"}</span>
+                      <span class="feedback-time">${formatDate(date)}</span>
+                    </div>
+                    <div class="feedback-description">${item.description || "No description"}</div>
+                    ${item.ticket_id ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">Ticket #${item.ticket_id}</div>` : ""}
+                  </div>
+                `;
+              })
+              .join("");
+          }
+        } catch (error) {
+          console.error("Search error:", error);
+          searchResults.innerHTML = '<p class="empty-state">Error performing search.</p>';
+        }
+      }
+
+      searchInput.addEventListener("input", performSearch);
+      roleFilter.addEventListener("change", performSearch);
+      dateFilter.addEventListener("change", performSearch);
+
+      // Template functionality
+      const templates = {
+        "Bug Report": {
+          issueType: "Bug",
+          priority: "High",
+          category: "",
+          description: "Brief description of the bug",
+          details: "Steps to Reproduce:\n1. \n2. \n3. \n\nExpected Behavior:\n\nActual Behavior:\n\nEnvironment:\n- Browser: \n- OS: ",
+          role: "Client"
+        },
+        "Feature Request": {
+          issueType: "Feature Request",
+          priority: "Medium",
+          category: "",
+          description: "Brief description of the requested feature",
+          details: "Use Case:\n\nExpected Benefits:\n\nAdditional Context:",
+          role: "Client"
+        },
+        "Performance Issue": {
+          issueType: "Performance",
+          priority: "High",
+          category: "",
+          description: "Brief description of the performance issue",
+          details: "When does it occur:\n\nImpact:\n\nSteps to Reproduce:\n1. \n2. \n\nExpected Performance:\n\nActual Performance:",
+          role: "Client"
+        }
+      };
+
+      document.querySelectorAll(".template-use-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const templateItem = btn.closest(".template-item");
+          const templateName = templateItem.querySelector("strong").textContent;
+          const template = templates[templateName];
+          
+          if (template && window.citiGhostWidget) {
+            window.citiGhostWidget.openFeedback(template);
+          } else if (window.citiGhostWidget) {
+            window.citiGhostWidget.openFeedback();
+          }
+        });
+      });
+
+      // Settings functionality
+      function loadSettings() {
+        const settings = JSON.parse(localStorage.getItem("citiGhostSettings") || "{}");
+        
+        // Load checkboxes
+        const checkboxes = document.querySelectorAll("#settingsCard input[type='checkbox']");
+        checkboxes.forEach((cb, index) => {
+          const keys = ["notifications", "autoScreenshot", "darkMode"];
+          if (keys[index] && settings[keys[index]] !== undefined) {
+            cb.checked = settings[keys[index]];
+          }
+        });
+        
+        // Load default role
+        const roleSelect = document.querySelector("#settingsCard .settings-select");
+        if (roleSelect && settings.defaultRole) {
+          roleSelect.value = settings.defaultRole;
+        }
+      }
+
+      function saveSettings() {
+        const checkboxes = document.querySelectorAll("#settingsCard input[type='checkbox']");
+        const roleSelect = document.querySelector("#settingsCard .settings-select");
+        
+        const settings = {
+          notifications: checkboxes[0]?.checked ?? true,
+          autoScreenshot: checkboxes[1]?.checked ?? true,
+          darkMode: checkboxes[2]?.checked ?? false,
+          defaultRole: roleSelect?.value || "Client"
+        };
+        
+        localStorage.setItem("citiGhostSettings", JSON.stringify(settings));
+        
+        // Apply default role to widget if available
+        if (window.citiGhostWidget && settings.defaultRole) {
+          const roleSelect = document.querySelector(".ghost-menu-role");
+          if (roleSelect) {
+            roleSelect.value = settings.defaultRole;
+          }
+        }
+        
+        return settings;
+      }
+
+      // Load settings when settings card is opened
+      shortcutButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          if (btn.dataset.action === "settings") {
+            setTimeout(loadSettings, 100);
+          }
+        });
+      });
+
+      document.querySelector(".settings-save-btn")?.addEventListener("click", () => {
+        saveSettings();
+        const status = document.createElement("div");
+        status.textContent = "Settings saved!";
+        status.style.cssText = "color: var(--accent-cyan); margin-top: 1rem; font-size: 0.9rem;";
+        const btn = document.querySelector(".settings-save-btn");
+        btn.parentNode.insertBefore(status, btn.nextSibling);
+        setTimeout(() => status.remove(), 2000);
+      });
+
+      // Initialize feedback display
+      loadFeedback();
+
+      // Refresh data when feedback card is opened
+      shortcutButtons.forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const action = btn.dataset.action;
+          if (action === "feedback" || action === "analytics" || action === "gallery" || 
+              action === "notifications" || action === "activity" || action === "archive") {
+            await loadFeedback();
+          }
+        });
+      });
+
+      // Archive functionality
+      async function updateArchiveStatus(ticketId, status) {
+        try {
+          const response = await fetch(`${API_BASE}/archive-feedback`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              ticket_id: ticketId,
+              status: status,
+            }),
+          });
+          const result = await response.json();
+          if (result.status === "success") {
+            loadArchive(); // Reload archive list
+            loadFeedback(); // Also reload main feedback list
+            return true;
+          } else {
+            alert("Error updating archive status: " + (result.message || "Unknown error"));
+            return false;
+          }
+        } catch (error) {
+          console.error("Error updating archive status:", error);
+          alert("Error updating archive status: " + error.message);
+          return false;
+        }
+      }
+
+      async function loadArchive() {
+        try {
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          const result = await response.json();
+          const feedbackData = result.status === "success" ? (result.tickets || []) : [];
+          
+          // Get filter values
+          const statusFilter = document.getElementById("archiveStatusFilter")?.value || "";
+          const dateFilter = document.getElementById("archiveDateFilter")?.value || "";
+          
+          // Apply filters
+          let filteredItems = feedbackData;
+          
+          // Status filter
+          if (statusFilter) {
+            filteredItems = filteredItems.filter(item => {
+              const status = item.archive_status || "active";
+              return status === statusFilter;
+            });
+          }
+          
+          // Date filter
+          if (dateFilter) {
+            const now = new Date();
+            let cutoffDate = new Date(0); // Default to all time
+            
+            switch (dateFilter) {
+              case "week":
+                cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                break;
+              case "month":
+                cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                break;
+              case "quarter":
+                cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                break;
+              case "year":
+                cutoffDate = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+                break;
+            }
+            
+            filteredItems = filteredItems.filter(item => {
+              const date = new Date(item.timestamp || Date.now());
+              return date >= cutoffDate;
+            });
+          }
+          
+          const archiveList = document.getElementById("archiveList");
+          if (archiveList) {
+            if (filteredItems.length === 0) {
+              archiveList.innerHTML = '<p class="empty-state">No items found matching the selected filters.</p>';
+            } else {
+              archiveList.innerHTML = filteredItems.map((item) => {
+                const date = new Date(item.timestamp || Date.now());
+                const archiveStatus = item.archive_status || "active";
+                const statusLabels = {
+                  "active": "Active",
+                  "archived": "Archived",
+                  "resolved": "Resolved",
+                  "closed": "Closed"
+                };
+                const statusColors = {
+                  "active": "#2DAEF7",
+                  "archived": "#9BA7B8",
+                  "resolved": "#10B981",
+                  "closed": "#6B7280"
+                };
+                
+                // Truncate description for display
+                const description = item.description || "No description";
+                const shortDescription = description.length > 150 
+                  ? description.substring(0, 150) + "..." 
+                  : description;
+                
+                return `
+                  <div class="archive-item">
+                    <div class="archive-item-header">
+                      <div class="archive-item-meta">
+                        <span class="archive-status-badge" style="background: ${statusColors[archiveStatus] || statusColors.active}20; color: ${statusColors[archiveStatus] || statusColors.active}; border: 1px solid ${statusColors[archiveStatus] || statusColors.active}40;">
+                          ${statusLabels[archiveStatus] || "Active"}
+                        </span>
+                        <span class="feedback-role">${item.role || "Client"}</span>
+                        ${item.issue_type ? `<span class="issue-type-badge">${item.issue_type}</span>` : ""}
+                        ${item.priority ? `<span class="priority-badge priority-${item.priority.toLowerCase()}">${item.priority}</span>` : ""}
+                      </div>
+                      <span class="feedback-time">${formatDate(date)}</span>
+                    </div>
+                    <div class="archive-item-content">
+                      <div class="feedback-description">${escapeHtml(shortDescription)}</div>
+                      ${item.ticket_id ? `<div class="ticket-id">Ticket #${item.ticket_id}</div>` : ""}
+                      ${item.category ? `<div class="category-tag">${item.category}</div>` : ""}
+                    </div>
+                    <div class="archive-item-actions">
+                      ${archiveStatus === "active" 
+                        ? `<button class="archive-action-btn archive-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'archived')" title="Archive this item">📦 Archive</button>`
+                        : `<button class="archive-action-btn unarchive-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'active')" title="Unarchive this item">↩️ Unarchive</button>`
+                      }
+                      ${archiveStatus !== "resolved" 
+                        ? `<button class="archive-action-btn resolve-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'resolved')" title="Mark as resolved">✓ Resolve</button>`
+                        : ""
+                      }
+                      ${archiveStatus !== "closed" 
+                        ? `<button class="archive-action-btn close-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'closed')" title="Close this item">✕ Close</button>`
+                        : ""
+                      }
+                    </div>
+                  </div>
+                `;
+              }).join("");
+            }
+          }
+        } catch (error) {
+          console.error("Error loading archive:", error);
+          const archiveList = document.getElementById("archiveList");
+          if (archiveList) {
+            archiveList.innerHTML = '<p class="empty-state">Error loading archive. Please try again.</p>';
+          }
+        }
+      }
+      
+      // Make updateArchiveStatus available globally for onclick handlers
+      window.updateArchiveStatus = updateArchiveStatus;
+      
+      // Add filter change listeners
+      document.getElementById("archiveStatusFilter")?.addEventListener("change", loadArchive);
+      document.getElementById("archiveDateFilter")?.addEventListener("change", loadArchive);
+
+      // Reports functionality
+      document.querySelectorAll("[data-report]").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const reportType = btn.dataset.report;
+          
+          if (reportType === "custom") {
+            // Open custom report modal
+            const modal = document.getElementById("customReportModal");
+            if (modal) {
+              modal.style.display = "flex";
+              // Set default dates (last 30 days)
+              const endDate = new Date();
+              const startDate = new Date();
+              startDate.setDate(startDate.getDate() - 30);
+              document.getElementById("reportEndDate").value = endDate.toISOString().split('T')[0];
+              document.getElementById("reportStartDate").value = startDate.toISOString().split('T')[0];
+            }
+            return;
+          }
+          
+          try {
+            const response = await fetch(`${API_BASE}/get-feedback`);
+            const result = await response.json();
+            const feedbackData = result.status === "success" ? (result.tickets || []) : [];
+            
+            let filtered = feedbackData;
+            const now = new Date();
+            
+            if (reportType === "weekly") {
+              const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+              filtered = feedbackData.filter(item => new Date(item.timestamp || 0) > weekAgo);
+            } else if (reportType === "monthly") {
+              const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+              filtered = feedbackData.filter(item => new Date(item.timestamp || 0) > monthAgo);
+            }
+            
+            // Generate report content
+            const reportContent = `Feedback Report - ${reportType.charAt(0).toUpperCase() + reportType.slice(1)}\n\n` +
+              `Total Items: ${filtered.length}\n` +
+              `Generated: ${new Date().toLocaleString()}\n\n` +
+              filtered.map(item => 
+                `Ticket #${item.ticket_id}\n` +
+                `Role: ${item.role}\n` +
+                `Date: ${item.timestamp}\n` +
+                `Description: ${item.description}\n` +
+                `---\n`
+              ).join("\n");
+            
+            const blob = new Blob([reportContent], { type: "text/plain" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `feedback-report-${reportType}-${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } catch (error) {
+            alert("Error generating report: " + error.message);
+          }
+        });
+      });
+
+      // Custom Report Modal functionality
+      const customReportModal = document.getElementById("customReportModal");
+      const closeCustomReport = document.getElementById("closeCustomReport");
+      const cancelCustomReport = document.getElementById("cancelCustomReport");
+      const generateCustomReport = document.getElementById("generateCustomReport");
+
+      function closeCustomReportModal() {
+        if (customReportModal) {
+          customReportModal.style.display = "none";
+        }
+      }
+
+      closeCustomReport?.addEventListener("click", closeCustomReportModal);
+      cancelCustomReport?.addEventListener("click", closeCustomReportModal);
+      
+      // Close when clicking overlay
+      customReportModal?.querySelector(".custom-report-overlay")?.addEventListener("click", closeCustomReportModal);
+
+      generateCustomReport?.addEventListener("click", async () => {
+        try {
+          const reportName = document.getElementById("reportName").value || "Custom Report";
+          const startDate = document.getElementById("reportStartDate").value;
+          const endDate = document.getElementById("reportEndDate").value;
+          const roleFilter = Array.from(document.getElementById("reportRoleFilter").selectedOptions).map(o => o.value);
+          const issueTypeFilter = Array.from(document.getElementById("reportIssueTypeFilter").selectedOptions).map(o => o.value);
+          const priorityFilter = Array.from(document.getElementById("reportPriorityFilter").selectedOptions).map(o => o.value);
+          const includeScreenshots = document.getElementById("includeScreenshots").checked;
+          const format = document.getElementById("reportFormat").value;
+
+          // Fetch all feedback
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          const result = await response.json();
+          let feedbackData = result.status === "success" ? (result.tickets || []) : [];
+
+          // Apply filters
+          if (startDate) {
+            const start = new Date(startDate);
+            feedbackData = feedbackData.filter(item => new Date(item.timestamp || 0) >= start);
+          }
+          if (endDate) {
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999); // Include entire end date
+            feedbackData = feedbackData.filter(item => new Date(item.timestamp || 0) <= end);
+          }
+          if (roleFilter.length > 0) {
+            feedbackData = feedbackData.filter(item => roleFilter.includes(item.role || "Client"));
+          }
+          if (issueTypeFilter.length > 0) {
+            feedbackData = feedbackData.filter(item => {
+              const description = item.description || "";
+              return issueTypeFilter.some(type => description.includes(`[${type}]`));
+            });
+          }
+          if (priorityFilter.length > 0) {
+            feedbackData = feedbackData.filter(item => {
+              const description = item.description || "";
+              return priorityFilter.some(priority => description.includes(`Priority: ${priority}`));
+            });
+          }
+
+          // Generate report based on format
+          let content, mimeType, filename;
+          
+          if (format === "csv") {
+            const headers = ["Ticket ID", "Role", "URL", "Description", "Screenshot", "Timestamp"];
+            const rows = feedbackData.map(item => [
+              item.ticket_id || "",
+              item.role || "",
+              item.url || "",
+              (item.description || "").replace(/"/g, '""'),
+              includeScreenshots && item.screenshot_path ? item.screenshot_path : "",
+              item.timestamp || ""
+            ]);
+            content = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(",")).join("\n");
+            mimeType = "text/csv";
+            filename = `${reportName.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.csv`;
+          } else if (format === "json") {
+            const reportData = {
+              reportName: reportName,
+              generated: new Date().toISOString(),
+              filters: {
+                startDate: startDate || null,
+                endDate: endDate || null,
+                roles: roleFilter,
+                issueTypes: issueTypeFilter,
+                priorities: priorityFilter
+              },
+              totalItems: feedbackData.length,
+              items: feedbackData.map(item => ({
+                ticket_id: item.ticket_id,
+                role: item.role,
+                url: item.url,
+                description: item.description,
+                screenshot: includeScreenshots ? item.screenshot_path : null,
+                timestamp: item.timestamp
+              }))
+            };
+            content = JSON.stringify(reportData, null, 2);
+            mimeType = "application/json";
+            filename = `${reportName.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.json`;
+          } else {
+            // Text format
+            let reportContent = `${reportName}\n`;
+            reportContent += `Generated: ${new Date().toLocaleString()}\n`;
+            reportContent += `Total Items: ${feedbackData.length}\n\n`;
+            
+            if (startDate || endDate) {
+              reportContent += `Date Range: ${startDate || "All"} to ${endDate || "All"}\n`;
+            }
+            if (roleFilter.length > 0) {
+              reportContent += `Roles: ${roleFilter.join(", ")}\n`;
+            }
+            if (issueTypeFilter.length > 0) {
+              reportContent += `Issue Types: ${issueTypeFilter.join(", ")}\n`;
+            }
+            if (priorityFilter.length > 0) {
+              reportContent += `Priorities: ${priorityFilter.join(", ")}\n`;
+            }
+            reportContent += "\n" + "=".repeat(50) + "\n\n";
+            
+            feedbackData.forEach((item, index) => {
+              reportContent += `Ticket #${item.ticket_id || index + 1}\n`;
+              reportContent += `Role: ${item.role || "N/A"}\n`;
+              reportContent += `Date: ${item.timestamp || "N/A"}\n`;
+              reportContent += `URL: ${item.url || "N/A"}\n`;
+              if (includeScreenshots && item.screenshot_path) {
+                reportContent += `Screenshot: ${item.screenshot_path}\n`;
+              }
+              reportContent += `Description:\n${item.description || "No description"}\n`;
+              reportContent += "\n" + "-".repeat(50) + "\n\n";
+            });
+            
+            content = reportContent;
+            mimeType = "text/plain";
+            filename = `${reportName.replace(/[^a-z0-9]/gi, '_')}-${Date.now()}.txt`;
+          }
+
+          // Download the file
+          const blob = new Blob([content], { type: mimeType });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(url);
+
+          // Close modal and show success
+          closeCustomReportModal();
+          alert(`Report "${reportName}" generated successfully!`);
+        } catch (error) {
+          console.error("Error generating custom report:", error);
+          alert("Error generating report: " + error.message);
+        }
+      });
+
+      // Load archive when archive card is opened
+      document.querySelector("[data-action='archive']")?.addEventListener("click", () => {
+        setTimeout(loadArchive, 100);
+      });
+      
+      // Helper function to escape HTML
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
+
+      // Listen for new feedback submissions
+      window.addEventListener("feedbackSubmitted", (event) => {
+        setTimeout(() => loadFeedback(), 500); // Small delay to ensure backend has processed
+      });
+
+      // Auto-refresh every 30 seconds
+      setInterval(() => {
+        loadFeedback();
+      }, 30000);
     </script>
   </body>
 </html>

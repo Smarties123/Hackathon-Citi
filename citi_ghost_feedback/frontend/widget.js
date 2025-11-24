@@ -129,7 +129,9 @@
         display: none;
       }
       .ghost-modal-card {
-        width: min(520px, 95%);
+        width: min(600px, 95%);
+        max-height: 90vh;
+        overflow-y: auto;
         background: #0f1a32;
         border-radius: 20px;
         border: 1px solid ${COLORS.border};
@@ -160,20 +162,72 @@
         font-size: 1.2rem;
         cursor: pointer;
       }
-      .ghost-modal-body textarea {
+      .ghost-modal-body {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 1.5rem 0;
+      }
+      .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+      }
+      .ghost-modal-body label {
+        font-size: 0.9rem;
+        color: ${COLORS.textPrimary};
+        font-weight: 500;
+      }
+      .ghost-select {
         width: 100%;
-        min-height: 120px;
+        padding: 0.75rem;
         background: #0a1429;
-        border-radius: 12px;
+        border-radius: 8px;
+        border: 1px solid ${COLORS.border};
+        color: ${COLORS.textPrimary};
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+      }
+      .ghost-select:hover {
+        border-color: ${COLORS.accentCyan};
+      }
+      .ghost-select:focus {
+        outline: none;
+        border-color: ${COLORS.accentBlue};
+      }
+      .ghost-textarea {
+        width: 100%;
+        min-height: 80px;
+        background: #0a1429;
+        border-radius: 8px;
         border: 1px solid ${COLORS.border};
         color: ${COLORS.textPrimary};
         padding: 0.75rem;
         resize: vertical;
         font-size: 0.95rem;
+        font-family: inherit;
+        transition: border-color 0.2s ease;
       }
-      .ghost-modal-body label {
-        font-size: 0.85rem;
+      .ghost-textarea:focus {
+        outline: none;
+        border-color: ${COLORS.accentBlue};
+      }
+      .ghost-textarea::placeholder {
         color: ${COLORS.textSecondary};
+        opacity: 0.6;
+      }
+      .field-hint {
+        font-size: 0.75rem;
+        color: ${COLORS.textSecondary};
+        margin-top: -0.25rem;
       }
       .ghost-modal-footer {
         display: flex;
@@ -208,6 +262,67 @@
       .ghost-status.error {
         color: ${COLORS.accentRed};
       }
+      .screenshot-section {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 0.5rem;
+      }
+      .screenshot-instructions {
+        background: rgba(17, 28, 51, 0.6);
+        border: 1px solid ${COLORS.border};
+        border-radius: 8px;
+        padding: 0.875rem;
+        font-size: 0.85rem;
+        color: ${COLORS.textSecondary};
+        line-height: 1.5;
+      }
+      .screenshot-instructions p {
+        margin: 0;
+      }
+      .screenshot-preview-container {
+        margin-top: 0.5rem;
+      }
+      .screenshot-preview-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 2px solid ${COLORS.border};
+        background: rgba(10, 20, 41, 0.8);
+      }
+      .screenshot-preview-img {
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+        object-fit: contain;
+        display: block;
+      }
+      .screenshot-delete-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(220, 38, 38, 0.9);
+        border: 2px solid #fff;
+        color: #fff;
+        font-size: 20px;
+        line-height: 1;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        padding: 0;
+      }
+      .screenshot-delete-btn:hover {
+        background: rgba(220, 38, 38, 1);
+        transform: scale(1.1);
+      }
       .ghost-meta {
         font-size: 0.8rem;
         color: ${COLORS.textSecondary};
@@ -231,7 +346,7 @@
     toolbar.className = "citi-ghost-toolbar";
     toolbar.innerHTML = `
       <div class="ghost-icon-mini">${createGhostSVG(32)}</div>
-      <span class="ghost-toolbar-label">Ghost Panel</span>
+      <span class="ghost-toolbar-label">Citi Snap</span>
     `;
     return toolbar;
   };
@@ -249,8 +364,6 @@
       </select>
       <div class="ghost-menu-actions">
         <button class="primary" data-action="give-feedback">Give Feedback</button>
-        <button class="placeholder" data-action="tickets">View Recent Tickets</button>
-        <button class="placeholder" data-action="settings">Settings</button>
       </div>
     `;
     return menu;
@@ -261,22 +374,87 @@
     modal.className = "citi-ghost-modal hidden";
     modal.innerHTML = `
       <div class="ghost-modal-card">
-        <div class="ghost-modal-header">
-          <div class="ghost-icon-mini">${createGhostSVG(40)}</div>
-          <div>
-            <h2>Submit Feedback</h2>
-            <p class="ghost-role-pill">Role: <span class="role-value">${state.role}</span></p>
-          </div>
-          <button class="ghost-modal-close" aria-label="Close feedback panel">&times;</button>
-        </div>
+                <div class="ghost-modal-header">
+                  <div class="ghost-icon-mini">${createGhostSVG(40)}</div>
+                  <div>
+                    <h2>Citi Snap - Submit Feedback</h2>
+                    <p class="ghost-role-pill">Role: <span class="role-value">${state.role}</span></p>
+                  </div>
+                  <button class="ghost-modal-close" aria-label="Close feedback panel">&times;</button>
+                </div>
         <div class="ghost-modal-body">
-          <label for="ghostDescription">Description</label>
-          <textarea id="ghostDescription" placeholder="What happened? Include key steps or context."></textarea>
+          <div class="form-field">
+            <label for="ghostIssueType">Issue Type *</label>
+            <select id="ghostIssueType" class="ghost-select" required>
+              <option value="">Select issue type...</option>
+              <option value="Bug">🐛 Bug</option>
+              <option value="Feature Request">✨ Feature Request</option>
+              <option value="Performance">⚡ Performance Issue</option>
+              <option value="UI/UX">🎨 UI/UX Improvement</option>
+              <option value="Security">🔒 Security Concern</option>
+              <option value="Data Issue">📊 Data Issue</option>
+              <option value="Integration">🔗 Integration Problem</option>
+              <option value="Other">📝 Other</option>
+            </select>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label for="ghostPriority">Priority *</label>
+              <select id="ghostPriority" class="ghost-select" required>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label for="ghostCategory">Category/Tag</label>
+              <select id="ghostCategory" class="ghost-select">
+                <option value="">None</option>
+                <option value="Trading">Trading</option>
+                <option value="Reporting">Reporting</option>
+                <option value="Authentication">Authentication</option>
+                <option value="API">API</option>
+                <option value="Dashboard">Dashboard</option>
+                <option value="Mobile">Mobile</option>
+                <option value="Backend">Backend</option>
+                <option value="Frontend">Frontend</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label for="ghostDescription">Description *</label>
+            <textarea id="ghostDescription" class="ghost-textarea" placeholder="Brief description of the issue or request (will be used as Jira summary)" required></textarea>
+            <small class="field-hint">Keep it concise - this becomes the Jira ticket title</small>
+          </div>
+
+          <div class="form-field">
+            <label for="ghostDetails">Additional Details</label>
+            <textarea id="ghostDetails" class="ghost-textarea" placeholder="Steps to reproduce, expected vs actual behavior, environment details, etc. (optional)"></textarea>
+            <small class="field-hint">This will be included in the Jira ticket description</small>
+          </div>
+
           <div class="ghost-modal-actions">
-            <button type="button" class="ghost-btn capture-btn">Capture Screenshot</button>
+            <div class="screenshot-section">
+              <div style="display: flex; gap: 0.5rem;">
+                <button type="button" class="ghost-btn capture-btn" style="flex: 1;">📸 Capture Current Page</button>
+                <button type="button" class="ghost-btn detect-clipboard-btn" style="flex: 1;">📋 Detect from Clipboard</button>
+              </div>
+              <div class="screenshot-instructions">
+                <p><strong>Tip:</strong> Take a screenshot with your system tool (Win+Shift+S / Cmd+Shift+4), then click "Detect from Clipboard" or just paste (Ctrl+V / Cmd+V) anywhere in this form.</p>
+              </div>
+              <div class="screenshot-preview-container" id="screenshotPreview" style="display: none;">
+                <div class="screenshot-preview-wrapper">
+                  <img id="screenshotPreviewImg" src="" alt="Screenshot preview" class="screenshot-preview-img">
+                  <button type="button" class="screenshot-delete-btn" id="screenshotDeleteBtn" title="Remove screenshot">×</button>
+                </div>
+              </div>
+            </div>
+            <input type="file" id="screenshotUpload" accept="image/*" style="display: none;">
             <span class="ghost-status capture-status"></span>
           </div>
-          <div class="ghost-meta ghost-url"></div>
         </div>
         <div class="ghost-modal-footer">
           <button class="secondary ghost-cancel">Cancel</button>
@@ -293,10 +471,6 @@
     roleLabel.textContent = state.role;
   };
 
-  const updateUrlMeta = (modal) => {
-    const urlMeta = modal.querySelector(".ghost-url");
-    urlMeta.textContent = `Page URL: ${window.location.href}`;
-  };
 
   injectStyles();
 
@@ -310,15 +484,22 @@
 
   const roleSelect = menu.querySelector(".ghost-menu-role");
   const captureBtn = modal.querySelector(".capture-btn");
+  const detectClipboardBtn = modal.querySelector(".detect-clipboard-btn");
   const captureStatus = modal.querySelector(".capture-status");
+  const screenshotUpload = modal.querySelector("#screenshotUpload");
+  const screenshotPreview = modal.querySelector("#screenshotPreview");
+  const screenshotPreviewImg = modal.querySelector("#screenshotPreviewImg");
+  const screenshotDeleteBtn = modal.querySelector("#screenshotDeleteBtn");
+  let captureCountdown = null;
   const submitBtn = modal.querySelector(".ghost-submit");
   const submitStatus = modal.querySelector(".submit-status");
   const descriptionInput = modal.querySelector("#ghostDescription");
+  const detailsInput = modal.querySelector("#ghostDetails");
+  const issueTypeInput = modal.querySelector("#ghostIssueType");
+  const priorityInput = modal.querySelector("#ghostPriority");
+  const categoryInput = modal.querySelector("#ghostCategory");
   const cancelBtn = modal.querySelector(".ghost-cancel");
   const closeBtn = modal.querySelector(".ghost-modal-close");
-  const urlMeta = modal.querySelector(".ghost-url");
-
-  urlMeta.textContent = `Page URL: ${window.location.href}`;
 
   const showMenu = (open) => {
     if (open) {
@@ -416,15 +597,112 @@
     updateRoleText(menu, modal);
   });
 
-  const openFeedbackModal = () => {
+  // Function to automatically detect screenshot from clipboard
+  const detectClipboardScreenshot = async () => {
+    try {
+      // Check if Clipboard API is available
+      if (!navigator.clipboard || !navigator.clipboard.read) {
+        // Fallback: try reading from paste event data
+        return false;
+      }
+
+      // Try to read clipboard
+      const clipboardItems = await navigator.clipboard.read();
+      
+      for (const clipboardItem of clipboardItems) {
+        // Check for image types
+        for (const type of clipboardItem.types) {
+          if (type.startsWith('image/')) {
+            const blob = await clipboardItem.getType(type);
+            const reader = new FileReader();
+            reader.onload = (event) => {
+              setScreenshot(event.target.result);
+              captureStatus.textContent = "Screenshot detected from clipboard!";
+              captureStatus.className = "ghost-status capture-status success";
+            };
+            reader.readAsDataURL(blob);
+            return true; // Found image, stop looking
+          }
+        }
+      }
+      return false;
+    } catch (error) {
+      // Clipboard might be empty or permission denied - that's okay
+      console.log("Clipboard read failed (this is normal):", error);
+      return false;
+    }
+  };
+
+  const openFeedbackModal = (templateData = null) => {
     modal.classList.remove("hidden");
     showMenu(false);
+    // Focus the modal to enable paste events
+    modal.focus();
+    modal.setAttribute("tabindex", "-1");
     submitStatus.textContent = "";
-    captureStatus.textContent = state.screenshotData ? "Screenshot ready." : "";
-    captureStatus.className = `ghost-status capture-status ${
-      state.screenshotData ? "success" : ""
-    }`;
-    updateUrlMeta(modal);
+    
+    // Reset clipboard check flag
+    clipboardCheckAttempted = false;
+    
+    // Clear any active countdown
+    if (captureCountdown) {
+      clearInterval(captureCountdown);
+      captureCountdown = null;
+    }
+    
+    // Show screenshot preview if exists
+    if (state.screenshotData && screenshotPreviewImg) {
+      screenshotPreviewImg.src = state.screenshotData;
+      if (screenshotPreview) {
+        screenshotPreview.style.display = "block";
+      }
+      captureStatus.textContent = "Screenshot ready.";
+      captureStatus.className = "ghost-status capture-status success";
+    } else {
+      if (screenshotPreview) {
+        screenshotPreview.style.display = "none";
+      }
+      captureStatus.textContent = "Click anywhere to detect screenshot from clipboard";
+      captureStatus.className = "ghost-status capture-status";
+    }
+    
+    // Apply template if provided
+    if (templateData) {
+      const descriptionField = modal.querySelector("#ghostDescription");
+      const detailsField = modal.querySelector("#ghostDetails");
+      const issueTypeField = modal.querySelector("#ghostIssueType");
+      const priorityField = modal.querySelector("#ghostPriority");
+      const categoryField = modal.querySelector("#ghostCategory");
+      
+      if (descriptionField && templateData.description) {
+        descriptionField.value = templateData.description;
+      }
+      if (detailsField && templateData.details) {
+        detailsField.value = templateData.details;
+      }
+      if (issueTypeField && templateData.issueType) {
+        issueTypeField.value = templateData.issueType;
+      }
+      if (priorityField && templateData.priority) {
+        priorityField.value = templateData.priority;
+      }
+      if (categoryField && templateData.category) {
+        categoryField.value = templateData.category;
+      }
+      if (templateData.role) {
+        state.role = templateData.role;
+        roleSelect.value = templateData.role;
+        updateRoleText(menu, modal);
+      }
+    } else {
+      // Clear all fields if no template
+      const descriptionField = modal.querySelector("#ghostDescription");
+      const detailsField = modal.querySelector("#ghostDetails");
+      const issueTypeField = modal.querySelector("#ghostIssueType");
+      if (descriptionField) descriptionField.value = "";
+      if (detailsField) detailsField.value = "";
+      if (issueTypeField) issueTypeField.value = "";
+    }
   };
 
   const closeModal = () => {
@@ -434,30 +712,65 @@
   menu.addEventListener("click", (event) => {
     if (event.target.matches("[data-action='give-feedback']")) {
       openFeedbackModal();
-    } else if (event.target.matches("[data-action='tickets']")) {
-      alert("Recent tickets view is coming soon.");
-    } else if (event.target.matches("[data-action='settings']")) {
-      alert("Settings panel is under construction.");
     }
   });
 
-  const resetScreenshot = () => {
+  // Function to set screenshot and show preview
+  const setScreenshot = (dataUrl) => {
+    state.screenshotData = dataUrl;
+    if (screenshotPreviewImg) {
+      screenshotPreviewImg.src = dataUrl;
+    }
+    if (screenshotPreview) {
+      screenshotPreview.style.display = "block";
+    }
+    captureStatus.textContent = "Screenshot ready.";
+    captureStatus.className = "ghost-status capture-status success";
+  };
+
+  // Function to remove screenshot
+  const removeScreenshot = () => {
     state.screenshotData = null;
+    if (screenshotPreview) {
+      screenshotPreview.style.display = "none";
+    }
+    if (screenshotPreviewImg) {
+      screenshotPreviewImg.src = "";
+    }
+    if (screenshotUpload) {
+      screenshotUpload.value = "";
+    }
     captureStatus.textContent = "";
     captureStatus.className = "ghost-status capture-status";
+  };
+
+  const resetScreenshot = () => {
+    removeScreenshot();
+    if (captureCountdown) {
+      clearInterval(captureCountdown);
+      captureCountdown = null;
+    }
   };
 
   cancelBtn.addEventListener("click", () => {
     closeModal();
     resetScreenshot();
-    descriptionInput.value = "";
+    if (descriptionInput) descriptionInput.value = "";
+    if (detailsInput) detailsInput.value = "";
+    if (issueTypeInput) issueTypeInput.value = "";
   });
 
   closeBtn.addEventListener("click", () => {
     closeModal();
   });
 
-  captureBtn.addEventListener("click", async () => {
+  // Delete screenshot button
+  screenshotDeleteBtn?.addEventListener("click", () => {
+    removeScreenshot();
+  });
+
+  // Capture current page
+  captureBtn?.addEventListener("click", async () => {
     if (typeof html2canvas !== "function") {
       captureStatus.textContent = "html2canvas is missing.";
       captureStatus.className = "ghost-status capture-status error";
@@ -466,55 +779,213 @@
     captureStatus.textContent = "Capturing screenshot...";
     captureStatus.className = "ghost-status capture-status";
     try {
-      const canvas = await html2canvas(document.body, { useCORS: true });
-      state.screenshotData = canvas.toDataURL("image/png");
-      captureStatus.textContent = "Screenshot captured.";
-      captureStatus.className = "ghost-status capture-status success";
+      const canvas = await html2canvas(document.body, { 
+        useCORS: true,
+        allowTaint: true,
+        logging: false
+      });
+      setScreenshot(canvas.toDataURL("image/png"));
     } catch (error) {
       console.error("Screenshot failed", error);
       state.screenshotData = null;
-      captureStatus.textContent = "Screenshot failed.";
+      captureStatus.textContent = "Screenshot failed: " + error.message;
       captureStatus.className = "ghost-status capture-status error";
     }
   });
 
+  // Detect from clipboard button
+  detectClipboardBtn?.addEventListener("click", async () => {
+    captureStatus.textContent = "Checking clipboard...";
+    captureStatus.className = "ghost-status capture-status";
+    
+    const detected = await detectClipboardScreenshot();
+    if (!detected) {
+      captureStatus.textContent = "No screenshot found in clipboard. Take a screenshot first, then try again or paste (Ctrl+V / Cmd+V).";
+      captureStatus.className = "ghost-status capture-status error";
+    }
+  });
+
+  // Upload screenshot from file
+  captureBtn?.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    screenshotUpload?.click();
+  });
+
+  // Double-click to upload
+  captureBtn?.addEventListener("dblclick", () => {
+    screenshotUpload?.click();
+  });
+
+  screenshotUpload?.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      captureStatus.textContent = "Please select an image file.";
+      captureStatus.className = "ghost-status capture-status error";
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setScreenshot(e.target.result);
+    };
+    reader.onerror = () => {
+      captureStatus.textContent = "Failed to read file.";
+      captureStatus.className = "ghost-status capture-status error";
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Auto-detect clipboard screenshot on any click in the modal
+  let clipboardCheckAttempted = false;
+  modal.addEventListener("click", async (e) => {
+    // Only check if we don't already have a screenshot and haven't checked yet
+    if (!state.screenshotData && !clipboardCheckAttempted) {
+      clipboardCheckAttempted = true;
+      captureStatus.textContent = "Checking clipboard...";
+      captureStatus.className = "ghost-status capture-status";
+      
+      const detected = await detectClipboardScreenshot();
+      if (!detected) {
+        // If clipboard API didn't work, the paste handler will catch it
+        captureStatus.textContent = "Take a screenshot, then paste here (Ctrl+V / Cmd+V) or click the button above";
+        captureStatus.className = "ghost-status capture-status";
+      }
+    }
+  }, { once: false });
+
+  // Handle paste events - this is the most reliable method
+  const handlePaste = async (e) => {
+    if (modal.classList.contains("hidden")) return;
+    
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        e.preventDefault();
+        e.stopPropagation();
+        const blob = items[i].getAsFile();
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          setScreenshot(event.target.result);
+          captureStatus.textContent = "Screenshot detected!";
+          captureStatus.className = "ghost-status capture-status success";
+          clipboardCheckAttempted = true; // Mark as detected
+        };
+        reader.readAsDataURL(blob);
+        return; // Found image, stop processing
+      }
+    }
+  };
+
+  // Listen for paste events on the modal and document
+  modal.addEventListener("paste", handlePaste);
+  document.addEventListener("paste", handlePaste);
+  
+  // Also add a focus handler to make paste work better
+  modal.addEventListener("focus", () => {
+    // Reset the check flag when modal gets focus
+    clipboardCheckAttempted = false;
+  });
+
   submitBtn.addEventListener("click", async () => {
-    const description = descriptionInput.value.trim();
+    const issueType = issueTypeInput ? issueTypeInput.value.trim() : "";
+    const priority = priorityInput ? priorityInput.value.trim() : "Medium";
+    const category = categoryInput ? categoryInput.value.trim() : "";
+    const description = descriptionInput ? descriptionInput.value.trim() : "";
+    const details = detailsInput ? detailsInput.value.trim() : "";
+
+    if (!issueType) {
+      submitStatus.textContent = "Issue type is required.";
+      submitStatus.className = "ghost-status submit-status error";
+      return;
+    }
     if (!description) {
       submitStatus.textContent = "Description is required.";
       submitStatus.className = "ghost-status submit-status error";
       return;
     }
+
     submitStatus.textContent = "Submitting...";
     submitStatus.className = "ghost-status submit-status";
+    
+    // Format description for Jira
+    let jiraDescription = description;
+    if (details) {
+      jiraDescription = `${description}\n\n*Additional Details:*\n${details}`;
+    }
+    
+    // Add tags/category
+    const tags = [];
+    if (category) tags.push(category);
+    if (priority) tags.push(`Priority: ${priority}`);
+    if (issueType) tags.push(issueType);
+    
+    const tagString = tags.length > 0 ? `\n\n*Tags:* ${tags.join(", ")}` : "";
+    jiraDescription += tagString;
+    jiraDescription += `\n\n*Submitted by:* ${state.role}`;
+    jiraDescription += `\n*URL:* ${window.location.href}`;
+
     try {
-      const response = await fetch("http://localhost:5000/submit-feedback", {
+      // Try both localhost and 127.0.0.1 for compatibility
+      const apiUrl = "http://127.0.0.1:5000/submit-feedback";
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           role: state.role,
-          description,
+          description: jiraDescription,
+          issueType: issueType,
+          priority: priority,
+          category: category,
           url: window.location.href,
           userAgent: navigator.userAgent,
           screenshot: state.screenshotData,
         }),
       });
-      const data = await response.json();
+      
       if (!response.ok) {
-        throw new Error(data.message || "Server error");
+        const errorData = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
+        throw new Error(errorData.message || `Server error: ${response.status}`);
       }
+      
+      const data = await response.json();
       submitStatus.textContent = `Feedback submitted! Ticket ID: ${data.ticket_id}`;
       submitStatus.className = "ghost-status submit-status success";
-      descriptionInput.value = "";
+      
+      // Clear all fields
+      if (descriptionInput) descriptionInput.value = "";
+      if (detailsInput) detailsInput.value = "";
+      if (issueTypeInput) issueTypeInput.value = "";
+      if (priorityInput) priorityInput.value = "Medium";
+      if (categoryInput) categoryInput.value = "";
       resetScreenshot();
+      
+      // Dispatch event to notify main page
+      window.dispatchEvent(new CustomEvent("feedbackSubmitted", {
+        detail: { ticket_id: data.ticket_id, timestamp: data.timestamp }
+      }));
+      
       setTimeout(() => {
         closeModal();
         submitStatus.textContent = "";
       }, 1800);
     } catch (error) {
-      submitStatus.textContent = error.message;
+      console.error("Submit error:", error);
+      let errorMessage = error.message;
+      
+      // Provide more helpful error messages
+      if (error.message.includes("Failed to fetch") || error.message.includes("NetworkError")) {
+        errorMessage = "Cannot connect to backend. Make sure the Flask server is running on port 5000.";
+      } else if (error.message.includes("CORS")) {
+        errorMessage = "CORS error. Check backend CORS settings.";
+      }
+      
+      submitStatus.textContent = errorMessage;
       submitStatus.className = "ghost-status submit-status error";
     }
   });
@@ -537,7 +1008,7 @@
 
   window.citiGhostWidget = {
     openMenu: () => showMenu(true),
-    openFeedback: openFeedbackModal,
+    openFeedback: (templateData) => openFeedbackModal(templateData),
     closeFeedback: closeModal,
   };
 
