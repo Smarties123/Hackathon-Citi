@@ -1,2 +1,3 @@
 Unique ID,Summary,Issue Type,Description,Portfolio,Reporter SOEID,Assignee SOEID,Reporter,Planned Start,Planned End,Parent ID,Epic Link,Evidence Path,Timestamp
 1,Automated test submission,Bug,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_150013_eb2ccfd9.png,2025-11-24 15:00:13
+2,Automated test submission,,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_160658_1ccbc7ee.png,2025-11-24 16:06:58

@@ -6,8 +6,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-from flask import Flask, jsonify, request
-
+from flask import Flask, jsonify, request, send_from_directory
 BASE_DIR = Path(__file__).resolve().parent
 EVIDENCE_DIR = BASE_DIR / "evidence"
 CSV_FILE = BASE_DIR / "feedback_storage.csv"
@@ -124,9 +123,52 @@ def append_feedback(
 @app.after_request
 def apply_cors(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type"
     return response
+
+
+@app.route("/screenshots/<path:filename>")
+def serve_screenshot(filename):
+    """Serve screenshot files."""
+    return send_from_directory(SCREENSHOT_DIR, filename)
+
+
+@app.route("/get-feedback", methods=["GET", "OPTIONS"])
+def get_feedback():
+    """Retrieve all feedback tickets from the Excel file."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    try:
+        wb, sheet = load_sheet()
+        tickets = []
+
+        # Skip header row (row 1)
+        for row in sheet.iter_rows(min_row=2, values_only=True):
+            if row[0]:  # If ticket ID exists
+                # Handle old format (without archive status) - default to "active"
+                archive_status = row[10] if len(row) > 10 else "active"
+                tickets.append({
+                    "ticket_id": row[0],
+                    "role": row[1] or "Client",
+                    "url": row[2] or "",
+                    "description": row[3] or "",
+                    "screenshot_path": row[4] or "",
+                    "user_agent": row[5] or "",
+                    "timestamp": row[6] or "",
+                    "issue_type": row[7] if len(row) > 7 else "",
+                    "priority": row[8] if len(row) > 8 else "",
+                    "category": row[9] if len(row) > 9 else "",
+                    "archive_status": archive_status,
+                })
+
+        # Reverse to show newest first
+        tickets.reverse()
+        return jsonify({"status": "success", "tickets": tickets, "count": len(tickets)})
+    except Exception as exc:
+        logger.exception("Unable to load tickets: %s", exc)
+        return jsonify({"status": "error", "message": "Failed to load feedback"}), 500
 
 
 @app.route("/submit-feedback", methods=["POST", "OPTIONS"])
@@ -150,6 +192,9 @@ def submit_feedback():
     url = payload.get("url", "").strip()
     user_agent = payload.get("userAgent", "Unknown")
     screenshot_data = payload.get("screenshot")
+    issue_type = payload.get("issueType", "").strip()
+    priority = payload.get("priority", "").strip()
+    category = payload.get("category", "").strip()
 
     if not description and not summary:
         logger.warning("Description or summary missing from payload")
@@ -186,6 +231,44 @@ def submit_feedback():
         return jsonify({"status": "error", "message": "Failed to store feedback"}), 500
 
     return jsonify({"status": "success", "ticket_id": ticket_id, "timestamp": timestamp})
+
+
+@app.route("/archive-feedback", methods=["PUT", "OPTIONS"])
+def archive_feedback():
+    """Archive or unarchive a feedback ticket."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    payload = request.get_json(force=True, silent=True) or {}
+    ticket_id = payload.get("ticket_id")
+    archive_status = payload.get("status", "archived")  # archived, resolved, closed, active
+
+    if not ticket_id:
+        return jsonify({"status": "error", "message": "Ticket ID is required"}), 400
+
+    try:
+        wb, sheet = load_sheet()
+        
+        # Find the ticket by ID
+        found = False
+        for row_idx in range(2, sheet.max_row + 1):
+            if sheet.cell(row=row_idx, column=1).value == ticket_id:
+                # Ensure Archive Status column exists
+                if sheet.max_column < 11:
+                    sheet.cell(row=1, column=11, value="Archive Status")
+                sheet.cell(row=row_idx, column=11, value=archive_status)
+                found = True
+                break
+
+        if not found:
+            return jsonify({"status": "error", "message": "Ticket not found"}), 404
+
+        wb.save(TICKETS_FILE)
+        logger.info("Updated ticket %s archive status to %s", ticket_id, archive_status)
+        return jsonify({"status": "success", "ticket_id": ticket_id, "archive_status": archive_status})
+    except Exception as exc:
+        logger.exception("Unable to update ticket archive status: %s", exc)
+        return jsonify({"status": "error", "message": "Failed to update archive status"}), 500
 
 
 if __name__ == "__main__":
