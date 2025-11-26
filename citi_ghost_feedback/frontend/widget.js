@@ -4,6 +4,8 @@
   }
   window.CitiGhostWidgetLoaded = true;
 
+  const API_BASE = "http://127.0.0.1:5000";
+
   const COLORS = {
     primaryBg: "#0A1224",
     secondaryBg: "#111C33",
@@ -16,7 +18,7 @@
   };
 
   const state = {
-    screenshotData: null,
+    screenshotData: [], // Array to support multiple screenshots
     role: "Client",
   };
 
@@ -64,11 +66,13 @@
       }
       .citi-ghost-menu {
         position: fixed;
-        width: 260px;
+        width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
         background: ${COLORS.secondaryBg};
-        border-radius: 14px;
+        border-radius: 16px;
         border: 1px solid ${COLORS.border};
-        padding: 1rem;
+        padding: 1.5rem;
         color: ${COLORS.textPrimary};
         font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
         box-shadow: 0 20px 55px rgba(0, 0, 0, 0.55);
@@ -79,29 +83,90 @@
       }
       .ghost-menu-label {
         font-size: 0.9rem;
-        color: ${COLORS.textSecondary};
-        margin-bottom: 0.35rem;
+        color: ${COLORS.textPrimary};
+        font-weight: 600;
+        margin-bottom: 0.75rem;
       }
       .ghost-menu-role {
         width: 100%;
         border-radius: 10px;
-        padding: 0.4rem;
+        padding: 0.75rem;
         border: 1px solid ${COLORS.border};
-        background: #0d172d;
+        background: rgba(10, 20, 41, 0.6);
         color: ${COLORS.textPrimary};
-        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        transition: border-color 0.2s ease;
+      }
+      .ghost-menu-role:hover {
+        border-color: ${COLORS.accentCyan};
+      }
+      .ghost-menu-role:focus {
+        outline: none;
+        border-color: ${COLORS.accentBlue};
+      }
+      .ghost-menu-quick-fields {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin: 1.25rem 0;
+      }
+      .ghost-menu-quick-fields .ghost-menu-field:first-child {
+        grid-column: 1 / -1;
+      }
+      .ghost-menu-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .ghost-menu-field label {
+        font-size: 0.85rem;
+        color: ${COLORS.textPrimary};
+        font-weight: 500;
+      }
+      .ghost-menu-input,
+      .ghost-menu-select {
+        width: 100%;
+        padding: 0.75rem;
+        background: rgba(10, 20, 41, 0.6);
+        border-radius: 10px;
+        border: 1px solid ${COLORS.border};
+        color: ${COLORS.textPrimary};
+        font-size: 0.9rem;
+        font-family: inherit;
+        transition: all 0.2s ease;
+      }
+      .ghost-menu-input:hover,
+      .ghost-menu-select:hover {
+        border-color: ${COLORS.accentCyan};
+      }
+      .ghost-menu-input:focus,
+      .ghost-menu-select:focus {
+        outline: none;
+        border-color: ${COLORS.accentBlue};
+        box-shadow: 0 0 0 3px rgba(37, 91, 227, 0.1);
+      }
+      .ghost-menu-input::placeholder {
+        color: ${COLORS.textSecondary};
+        opacity: 0.6;
+      }
+      .ghost-menu-actions {
+        margin-top: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
       }
       .ghost-menu-actions button {
         width: 100%;
         border-radius: 10px;
-        padding: 0.6rem 0.75rem;
-        margin-top: 0.45rem;
-        border: 1px solid rgba(45, 174, 247, 0.35);
-        background: rgba(37, 91, 227, 0.15);
-        color: ${COLORS.textPrimary};
+        padding: 0.75rem 1rem;
+        border: 1px solid transparent;
+        background: ${COLORS.accentBlue};
+        color: #fff;
         font-weight: 600;
+        font-size: 0.95rem;
         cursor: pointer;
-        transition: transform 0.1s ease, box-shadow 0.1s ease;
+        transition: all 0.2s ease;
       }
       .ghost-menu-actions button.primary {
         background: ${COLORS.accentBlue};
@@ -109,14 +174,26 @@
       }
       .ghost-menu-actions button.placeholder {
         opacity: 0.65;
+        background: rgba(37, 91, 227, 0.15);
+        border-color: rgba(45, 174, 247, 0.35);
+        color: ${COLORS.textPrimary};
       }
       .ghost-menu-actions button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(37, 91, 227, 0.4);
+        background: #1e4fd4;
+      }
+      .ghost-menu-actions button:active {
+        transform: translateY(0);
       }
       .citi-ghost-modal {
         position: fixed;
-        inset: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100vw;
+        height: 100vh;
         background: rgba(10, 18, 36, 0.82);
         backdrop-filter: blur(6px);
         display: flex;
@@ -124,25 +201,46 @@
         justify-content: center;
         z-index: 2147483999;
         font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        overflow: auto;
       }
       .citi-ghost-modal.hidden {
-        display: none;
+        display: none !important;
       }
       .ghost-modal-card {
-        width: min(600px, 95%);
+        width: min(700px, 95%);
         max-height: 90vh;
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
         background: #0f1a32;
         border-radius: 20px;
         border: 1px solid ${COLORS.border};
-        padding: 1.5rem;
+        padding: 0;
         box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
       }
       .ghost-modal-header {
         display: flex;
         gap: 0.75rem;
         align-items: center;
-        margin-bottom: 1rem;
+        padding: 1.5rem 1.5rem 1rem 1.5rem;
+        flex-shrink: 0;
+      }
+      .ghost-modal-body {
+        padding: 0 1.5rem;
+        overflow-y: auto;
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .ghost-modal-footer {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+        flex-shrink: 0;
+        border-top: 1px solid ${COLORS.border};
+        margin-top: 1rem;
+        display: flex;
+        gap: 0.75rem;
+        justify-content: flex-end;
       }
       .ghost-modal-header h2 {
         margin: 0;
@@ -166,7 +264,6 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        padding: 1.5rem 0;
       }
       .form-field {
         display: flex;
@@ -184,6 +281,25 @@
         font-size: 0.9rem;
         color: ${COLORS.textPrimary};
         font-weight: 500;
+      }
+      .ghost-input {
+        width: 100%;
+        padding: 0.75rem;
+        background: #0a1429;
+        border-radius: 8px;
+        border: 1px solid ${COLORS.border};
+        color: ${COLORS.textPrimary};
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: border-color 0.2s ease;
+      }
+      .ghost-input:focus {
+        outline: none;
+        border-color: ${COLORS.accentBlue};
+      }
+      .ghost-input::placeholder {
+        color: ${COLORS.textSecondary};
+        opacity: 0.6;
       }
       .ghost-select {
         width: 100%;
@@ -228,12 +344,6 @@
         font-size: 0.75rem;
         color: ${COLORS.textSecondary};
         margin-top: -0.25rem;
-      }
-      .ghost-modal-footer {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        margin-top: 1rem;
       }
       .ghost-modal-footer button {
         border-radius: 10px;
@@ -283,21 +393,25 @@
       .screenshot-preview-container {
         margin-top: 0.5rem;
       }
+      .screenshots-preview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+      }
       .screenshot-preview-wrapper {
         position: relative;
         display: inline-block;
-        width: 100%;
-        max-width: 100%;
         border-radius: 8px;
         overflow: hidden;
         border: 2px solid ${COLORS.border};
         background: rgba(10, 20, 41, 0.8);
+        aspect-ratio: 16/9;
       }
       .screenshot-preview-img {
         width: 100%;
-        height: auto;
-        max-height: 300px;
-        object-fit: contain;
+        height: 100%;
+        object-fit: cover;
         display: block;
       }
       .screenshot-delete-btn {
@@ -362,6 +476,59 @@
         <option value="Product Management">Product Management</option>
         <option value="Engineering">Engineering</option>
       </select>
+      
+      <div class="ghost-menu-quick-fields">
+        <div class="ghost-menu-field" style="grid-column: 1 / -1;">
+          <label for="menuIssueType">Issue Type *</label>
+          <select id="menuIssueType" class="ghost-menu-select">
+            <option value="Task">Task</option>
+            <option value="Bug">Bug</option>
+            <option value="Story">Story</option>
+            <option value="Incident">Incident</option>
+          </select>
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuPortfolio">Portfolio</label>
+          <input type="text" id="menuPortfolio" class="ghost-menu-input" placeholder="Portfolio name" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuReporterSOEID">Reporter SOEID</label>
+          <input type="text" id="menuReporterSOEID" class="ghost-menu-input" placeholder="Reporter SOEID" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuAssigneeSOEID">Assignee SOEID</label>
+          <input type="text" id="menuAssigneeSOEID" class="ghost-menu-input" placeholder="Assignee SOEID" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuReporter">Reporter</label>
+          <input type="text" id="menuReporter" class="ghost-menu-input" placeholder="Reporter name" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuPlannedStart">Planned Start</label>
+          <input type="date" id="menuPlannedStart" class="ghost-menu-input" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuPlannedEnd">Planned End</label>
+          <input type="date" id="menuPlannedEnd" class="ghost-menu-input" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuParentID">Parent ID</label>
+          <input type="text" id="menuParentID" class="ghost-menu-input" placeholder="Parent ticket ID" />
+        </div>
+        
+        <div class="ghost-menu-field">
+          <label for="menuEpicLink">Epic Link</label>
+          <input type="text" id="menuEpicLink" class="ghost-menu-input" placeholder="Epic link" />
+        </div>
+      </div>
+      
       <div class="ghost-menu-actions">
         <button class="primary" data-action="give-feedback">Give Feedback</button>
       </div>
@@ -384,56 +551,13 @@
                 </div>
         <div class="ghost-modal-body">
           <div class="form-field">
-            <label for="ghostIssueType">Issue Type *</label>
-            <select id="ghostIssueType" class="ghost-select" required>
-              <option value="">Select issue type...</option>
-              <option value="Bug">🐛 Bug</option>
-              <option value="Feature Request">✨ Feature Request</option>
-              <option value="Performance">⚡ Performance Issue</option>
-              <option value="UI/UX">🎨 UI/UX Improvement</option>
-              <option value="Security">🔒 Security Concern</option>
-              <option value="Data Issue">📊 Data Issue</option>
-              <option value="Integration">🔗 Integration Problem</option>
-              <option value="Other">📝 Other</option>
-            </select>
-          </div>
-          
-          <div class="form-row">
-            <div class="form-field">
-              <label for="ghostPriority">Priority *</label>
-              <select id="ghostPriority" class="ghost-select" required>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-                <option value="High">High</option>
-                <option value="Critical">Critical</option>
-              </select>
-            </div>
-            <div class="form-field">
-              <label for="ghostCategory">Category/Tag</label>
-              <select id="ghostCategory" class="ghost-select">
-                <option value="">None</option>
-                <option value="Trading">Trading</option>
-                <option value="Reporting">Reporting</option>
-                <option value="Authentication">Authentication</option>
-                <option value="API">API</option>
-                <option value="Dashboard">Dashboard</option>
-                <option value="Mobile">Mobile</option>
-                <option value="Backend">Backend</option>
-                <option value="Frontend">Frontend</option>
-              </select>
-            </div>
+            <label for="ghostSummary">Summary *</label>
+            <input type="text" id="ghostSummary" class="ghost-input" placeholder="Brief summary of the issue or request" required />
           </div>
 
           <div class="form-field">
             <label for="ghostDescription">Description *</label>
-            <textarea id="ghostDescription" class="ghost-textarea" placeholder="Brief description of the issue or request (will be used as Jira summary)" required></textarea>
-            <small class="field-hint">Keep it concise - this becomes the Jira ticket title</small>
-          </div>
-
-          <div class="form-field">
-            <label for="ghostDetails">Additional Details</label>
-            <textarea id="ghostDetails" class="ghost-textarea" placeholder="Steps to reproduce, expected vs actual behavior, environment details, etc. (optional)"></textarea>
-            <small class="field-hint">This will be included in the Jira ticket description</small>
+            <textarea id="ghostDescription" class="ghost-textarea" placeholder="Detailed description of the issue or request" required></textarea>
           </div>
 
           <div class="ghost-modal-actions">
@@ -443,16 +567,13 @@
                 <button type="button" class="ghost-btn detect-clipboard-btn" style="flex: 1;">📋 Detect from Clipboard</button>
               </div>
               <div class="screenshot-instructions">
-                <p><strong>Tip:</strong> Take a screenshot with your system tool (Win+Shift+S / Cmd+Shift+4), then click "Detect from Clipboard" or just paste (Ctrl+V / Cmd+V) anywhere in this form.</p>
+                <p><strong>Tip:</strong> Take a screenshot with your system tool (Win+Shift+S / Cmd+Shift+4), then click "Detect from Clipboard" or just paste (Ctrl+V / Cmd+V) anywhere in this form. You can add multiple screenshots.</p>
               </div>
-              <div class="screenshot-preview-container" id="screenshotPreview" style="display: none;">
-                <div class="screenshot-preview-wrapper">
-                  <img id="screenshotPreviewImg" src="" alt="Screenshot preview" class="screenshot-preview-img">
-                  <button type="button" class="screenshot-delete-btn" id="screenshotDeleteBtn" title="Remove screenshot">×</button>
-                </div>
+              <div class="screenshots-preview-grid" id="screenshotsPreview" style="display: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+                <!-- Screenshot previews will be added here dynamically -->
               </div>
             </div>
-            <input type="file" id="screenshotUpload" accept="image/*" style="display: none;">
+            <input type="file" id="screenshotUpload" accept="image/*" multiple style="display: none;">
             <span class="ghost-status capture-status"></span>
           </div>
         </div>
@@ -487,17 +608,23 @@
   const detectClipboardBtn = modal.querySelector(".detect-clipboard-btn");
   const captureStatus = modal.querySelector(".capture-status");
   const screenshotUpload = modal.querySelector("#screenshotUpload");
-  const screenshotPreview = modal.querySelector("#screenshotPreview");
-  const screenshotPreviewImg = modal.querySelector("#screenshotPreviewImg");
-  const screenshotDeleteBtn = modal.querySelector("#screenshotDeleteBtn");
+  const screenshotsPreview = modal.querySelector("#screenshotsPreview");
   let captureCountdown = null;
   const submitBtn = modal.querySelector(".ghost-submit");
   const submitStatus = modal.querySelector(".submit-status");
+  const summaryInput = modal.querySelector("#ghostSummary");
   const descriptionInput = modal.querySelector("#ghostDescription");
-  const detailsInput = modal.querySelector("#ghostDetails");
-  const issueTypeInput = modal.querySelector("#ghostIssueType");
-  const priorityInput = modal.querySelector("#ghostPriority");
-  const categoryInput = modal.querySelector("#ghostCategory");
+  
+  // Menu fields (these are in the initial panel)
+  const menuIssueType = menu.querySelector("#menuIssueType");
+  const menuPortfolio = menu.querySelector("#menuPortfolio");
+  const menuReporterSOEID = menu.querySelector("#menuReporterSOEID");
+  const menuAssigneeSOEID = menu.querySelector("#menuAssigneeSOEID");
+  const menuReporter = menu.querySelector("#menuReporter");
+  const menuPlannedStart = menu.querySelector("#menuPlannedStart");
+  const menuPlannedEnd = menu.querySelector("#menuPlannedEnd");
+  const menuParentID = menu.querySelector("#menuParentID");
+  const menuEpicLink = menu.querySelector("#menuEpicLink");
   const cancelBtn = modal.querySelector(".ghost-cancel");
   const closeBtn = modal.querySelector(".ghost-modal-close");
 
@@ -616,7 +743,7 @@
             const blob = await clipboardItem.getType(type);
             const reader = new FileReader();
             reader.onload = (event) => {
-              setScreenshot(event.target.result);
+              addScreenshot(event.target.result);
               captureStatus.textContent = "Screenshot detected from clipboard!";
               captureStatus.className = "ghost-status capture-status success";
             };
@@ -635,11 +762,16 @@
 
   const openFeedbackModal = (templateData = null) => {
     modal.classList.remove("hidden");
+    // Ensure modal covers full screen
+    modal.style.visibility = "visible";
+    modal.style.opacity = "1";
     showMenu(false);
     // Focus the modal to enable paste events
     modal.focus();
     modal.setAttribute("tabindex", "-1");
     submitStatus.textContent = "";
+    
+    // Values from menu quick fields will be used directly in submit (no need to copy to modal)
     
     // Reset clipboard check flag
     clipboardCheckAttempted = false;
@@ -651,43 +783,28 @@
     }
     
     // Show screenshot preview if exists
-    if (state.screenshotData && screenshotPreviewImg) {
-      screenshotPreviewImg.src = state.screenshotData;
-      if (screenshotPreview) {
-        screenshotPreview.style.display = "block";
-      }
-      captureStatus.textContent = "Screenshot ready.";
+    updateScreenshotsPreview();
+    if (state.screenshotData.length > 0) {
+      captureStatus.textContent = `${state.screenshotData.length} screenshot(s) ready.`;
       captureStatus.className = "ghost-status capture-status success";
     } else {
-      if (screenshotPreview) {
-        screenshotPreview.style.display = "none";
-      }
       captureStatus.textContent = "Click anywhere to detect screenshot from clipboard";
       captureStatus.className = "ghost-status capture-status";
     }
     
     // Apply template if provided
     if (templateData) {
+      const summaryField = modal.querySelector("#ghostSummary");
       const descriptionField = modal.querySelector("#ghostDescription");
-      const detailsField = modal.querySelector("#ghostDetails");
-      const issueTypeField = modal.querySelector("#ghostIssueType");
-      const priorityField = modal.querySelector("#ghostPriority");
-      const categoryField = modal.querySelector("#ghostCategory");
       
+      if (summaryField && templateData.summary) {
+        summaryField.value = templateData.summary;
+      }
       if (descriptionField && templateData.description) {
         descriptionField.value = templateData.description;
       }
-      if (detailsField && templateData.details) {
-        detailsField.value = templateData.details;
-      }
-      if (issueTypeField && templateData.issueType) {
-        issueTypeField.value = templateData.issueType;
-      }
-      if (priorityField && templateData.priority) {
-        priorityField.value = templateData.priority;
-      }
-      if (categoryField && templateData.category) {
-        categoryField.value = templateData.category;
+      if (menuIssueType && templateData.issueType) {
+        menuIssueType.value = templateData.issueType;
       }
       if (templateData.role) {
         state.role = templateData.role;
@@ -695,18 +812,18 @@
         updateRoleText(menu, modal);
       }
     } else {
-      // Clear all fields if no template
+      // Clear modal fields if no template (menu fields stay for next submission)
+      const summaryField = modal.querySelector("#ghostSummary");
       const descriptionField = modal.querySelector("#ghostDescription");
-      const detailsField = modal.querySelector("#ghostDetails");
-      const issueTypeField = modal.querySelector("#ghostIssueType");
+      if (summaryField) summaryField.value = "";
       if (descriptionField) descriptionField.value = "";
-      if (detailsField) detailsField.value = "";
-      if (issueTypeField) issueTypeField.value = "";
     }
   };
 
   const closeModal = () => {
     modal.classList.add("hidden");
+    modal.style.visibility = "";
+    modal.style.opacity = "";
   };
 
   menu.addEventListener("click", (event) => {
@@ -715,59 +832,76 @@
     }
   });
 
-  // Function to set screenshot and show preview
-  const setScreenshot = (dataUrl) => {
-    state.screenshotData = dataUrl;
-    if (screenshotPreviewImg) {
-      screenshotPreviewImg.src = dataUrl;
+  // Function to add screenshot and show preview
+  const addScreenshot = (dataUrl) => {
+    if (!state.screenshotData.includes(dataUrl)) {
+      state.screenshotData.push(dataUrl);
+      updateScreenshotsPreview();
+      captureStatus.textContent = `Screenshot added (${state.screenshotData.length} total).`;
+      captureStatus.className = "ghost-status capture-status success";
     }
-    if (screenshotPreview) {
-      screenshotPreview.style.display = "block";
-    }
-    captureStatus.textContent = "Screenshot ready.";
-    captureStatus.className = "ghost-status capture-status success";
   };
 
-  // Function to remove screenshot
-  const removeScreenshot = () => {
-    state.screenshotData = null;
-    if (screenshotPreview) {
-      screenshotPreview.style.display = "none";
+  // Function to remove screenshot by index
+  const removeScreenshot = (index) => {
+    if (index >= 0 && index < state.screenshotData.length) {
+      state.screenshotData.splice(index, 1);
+      updateScreenshotsPreview();
+      if (state.screenshotData.length === 0) {
+        captureStatus.textContent = "";
+        captureStatus.className = "ghost-status capture-status";
+      } else {
+        captureStatus.textContent = `${state.screenshotData.length} screenshot(s) ready.`;
+        captureStatus.className = "ghost-status capture-status success";
+      }
     }
-    if (screenshotPreviewImg) {
-      screenshotPreviewImg.src = "";
+  };
+
+  // Function to update the screenshots preview grid
+  const updateScreenshotsPreview = () => {
+    if (!screenshotsPreview) return;
+    
+    if (state.screenshotData.length === 0) {
+      screenshotsPreview.style.display = "none";
+      return;
     }
+
+    screenshotsPreview.style.display = "grid";
+    screenshotsPreview.innerHTML = state.screenshotData.map((dataUrl, index) => `
+      <div class="screenshot-preview-wrapper">
+        <img src="${dataUrl}" alt="Screenshot ${index + 1}" class="screenshot-preview-img">
+        <button type="button" class="screenshot-delete-btn" onclick="window.citiGhostWidget?.removeScreenshot(${index})" title="Remove screenshot">×</button>
+      </div>
+    `).join("");
+  };
+
+  const resetScreenshot = () => {
+    state.screenshotData = [];
+    updateScreenshotsPreview();
     if (screenshotUpload) {
       screenshotUpload.value = "";
+    }
+    if (captureCountdown) {
+      clearInterval(captureCountdown);
+      captureCountdown = null;
     }
     captureStatus.textContent = "";
     captureStatus.className = "ghost-status capture-status";
   };
 
-  const resetScreenshot = () => {
-    removeScreenshot();
-    if (captureCountdown) {
-      clearInterval(captureCountdown);
-      captureCountdown = null;
-    }
-  };
-
   cancelBtn.addEventListener("click", () => {
     closeModal();
     resetScreenshot();
+    if (summaryInput) summaryInput.value = "";
     if (descriptionInput) descriptionInput.value = "";
-    if (detailsInput) detailsInput.value = "";
-    if (issueTypeInput) issueTypeInput.value = "";
+    // Note: Menu fields are kept for next submission
   });
 
   closeBtn.addEventListener("click", () => {
     closeModal();
   });
 
-  // Delete screenshot button
-  screenshotDeleteBtn?.addEventListener("click", () => {
-    removeScreenshot();
-  });
+  // Delete screenshot button removed - now handled inline in preview grid
 
   // Capture current page
   captureBtn?.addEventListener("click", async () => {
@@ -778,16 +912,41 @@
     }
     captureStatus.textContent = "Capturing screenshot...";
     captureStatus.className = "ghost-status capture-status";
+    
     try {
+      // Temporarily hide the modal overlay during capture
+      const wasHidden = modal.classList.contains("hidden");
+      if (!wasHidden) {
+        modal.style.visibility = "hidden";
+        modal.style.opacity = "0";
+      }
+      
+      // Small delay to ensure modal is hidden before capture
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Capture the page (excluding the modal)
       const canvas = await html2canvas(document.body, { 
         useCORS: true,
         allowTaint: true,
-        logging: false
+        logging: false,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight
       });
-      setScreenshot(canvas.toDataURL("image/png"));
+      
+      // Restore modal visibility
+      if (!wasHidden) {
+        modal.style.visibility = "";
+        modal.style.opacity = "";
+      }
+      
+      addScreenshot(canvas.toDataURL("image/png"));
+      captureStatus.textContent = "Screenshot captured!";
+      captureStatus.className = "ghost-status capture-status success";
     } catch (error) {
       console.error("Screenshot failed", error);
-      state.screenshotData = null;
+      // Ensure modal is visible even if capture fails
+      modal.style.visibility = "";
+      modal.style.opacity = "";
       captureStatus.textContent = "Screenshot failed: " + error.message;
       captureStatus.className = "ghost-status capture-status error";
     }
@@ -817,31 +976,45 @@
   });
 
   screenshotUpload?.addEventListener("change", (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
-    if (!file.type.startsWith("image/")) {
-      captureStatus.textContent = "Please select an image file.";
-      captureStatus.className = "ghost-status capture-status error";
-      return;
-    }
+    let loadedCount = 0;
+    let errorCount = 0;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setScreenshot(e.target.result);
-    };
-    reader.onerror = () => {
-      captureStatus.textContent = "Failed to read file.";
-      captureStatus.className = "ghost-status capture-status error";
-    };
-    reader.readAsDataURL(file);
+    Array.from(files).forEach((file) => {
+      if (!file.type.startsWith("image/")) {
+        errorCount++;
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        addScreenshot(e.target.result);
+        loadedCount++;
+        if (loadedCount + errorCount === files.length) {
+          if (errorCount > 0) {
+            captureStatus.textContent = `Loaded ${loadedCount} image(s). ${errorCount} file(s) skipped (not images).`;
+            captureStatus.className = "ghost-status capture-status";
+          }
+        }
+      };
+      reader.onerror = () => {
+        errorCount++;
+        if (loadedCount + errorCount === files.length) {
+          captureStatus.textContent = `Failed to load some files. ${loadedCount} loaded, ${errorCount} failed.`;
+          captureStatus.className = "ghost-status capture-status error";
+        }
+      };
+      reader.readAsDataURL(file);
+    });
   });
 
   // Auto-detect clipboard screenshot on any click in the modal
   let clipboardCheckAttempted = false;
   modal.addEventListener("click", async (e) => {
-    // Only check if we don't already have a screenshot and haven't checked yet
-    if (!state.screenshotData && !clipboardCheckAttempted) {
+    // Only check if we don't already have screenshots and haven't checked yet
+    if (state.screenshotData.length === 0 && !clipboardCheckAttempted) {
       clipboardCheckAttempted = true;
       captureStatus.textContent = "Checking clipboard...";
       captureStatus.className = "ghost-status capture-status";
@@ -869,7 +1042,7 @@
         const blob = items[i].getAsFile();
         const reader = new FileReader();
         reader.onload = (event) => {
-          setScreenshot(event.target.result);
+          addScreenshot(event.target.result);
           captureStatus.textContent = "Screenshot detected!";
           captureStatus.className = "ghost-status capture-status success";
           clipboardCheckAttempted = true; // Mark as detected
@@ -891,60 +1064,52 @@
   });
 
   submitBtn.addEventListener("click", async () => {
-    const issueType = issueTypeInput ? issueTypeInput.value.trim() : "";
-    const priority = priorityInput ? priorityInput.value.trim() : "Medium";
-    const category = categoryInput ? categoryInput.value.trim() : "";
+    const summary = summaryInput ? summaryInput.value.trim() : "";
     const description = descriptionInput ? descriptionInput.value.trim() : "";
-    const details = detailsInput ? detailsInput.value.trim() : "";
+    
+    // Get all fields from menu (initial panel)
+    const issueType = menuIssueType ? menuIssueType.value.trim() : "Task";
+    const portfolio = menuPortfolio ? menuPortfolio.value.trim() : "";
+    const reporterSOEID = menuReporterSOEID ? menuReporterSOEID.value.trim() : "";
+    const assigneeSOEID = menuAssigneeSOEID ? menuAssigneeSOEID.value.trim() : "";
+    const reporter = menuReporter ? menuReporter.value.trim() : "";
+    const plannedStart = menuPlannedStart ? menuPlannedStart.value : "";
+    const plannedEnd = menuPlannedEnd ? menuPlannedEnd.value : "";
+    const parentID = menuParentID ? menuParentID.value.trim() : "";
+    const epicLink = menuEpicLink ? menuEpicLink.value.trim() : "";
 
-    if (!issueType) {
-      submitStatus.textContent = "Issue type is required.";
-      submitStatus.className = "ghost-status submit-status error";
-      return;
-    }
-    if (!description) {
-      submitStatus.textContent = "Description is required.";
+    if (!summary && !description) {
+      submitStatus.textContent = "Summary or description is required.";
       submitStatus.className = "ghost-status submit-status error";
       return;
     }
 
     submitStatus.textContent = "Submitting...";
     submitStatus.className = "ghost-status submit-status";
-    
-    // Format description for Jira
-    let jiraDescription = description;
-    if (details) {
-      jiraDescription = `${description}\n\n*Additional Details:*\n${details}`;
-    }
-    
-    // Add tags/category
-    const tags = [];
-    if (category) tags.push(category);
-    if (priority) tags.push(`Priority: ${priority}`);
-    if (issueType) tags.push(issueType);
-    
-    const tagString = tags.length > 0 ? `\n\n*Tags:* ${tags.join(", ")}` : "";
-    jiraDescription += tagString;
-    jiraDescription += `\n\n*Submitted by:* ${state.role}`;
-    jiraDescription += `\n*URL:* ${window.location.href}`;
 
     try {
-      // Try both localhost and 127.0.0.1 for compatibility
-      const apiUrl = "http://127.0.0.1:5000/submit-feedback";
+      const apiUrl = `${API_BASE}/submit-feedback`;
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          role: state.role,
-          description: jiraDescription,
-          issueType: issueType,
-          priority: priority,
-          category: category,
+          summary: summary || description,
+          issue_type: issueType,
+          description: description,
+          portfolio: portfolio || undefined,
+          reporter_soeid: reporterSOEID || undefined,
+          assignee_soeid: assigneeSOEID || undefined,
+          reporter: reporter || undefined,
+          planned_start: plannedStart || undefined,
+          planned_end: plannedEnd || undefined,
+          parent_id: parentID || undefined,
+          epic_link: epicLink || undefined,
           url: window.location.href,
           userAgent: navigator.userAgent,
-          screenshot: state.screenshotData,
+          screenshots: state.screenshotData, // Send as array
+          screenshot: state.screenshotData.length > 0 ? state.screenshotData[0] : undefined, // Backward compatibility
         }),
       });
       
@@ -958,11 +1123,18 @@
       submitStatus.className = "ghost-status submit-status success";
       
       // Clear all fields
+      if (summaryInput) summaryInput.value = "";
       if (descriptionInput) descriptionInput.value = "";
-      if (detailsInput) detailsInput.value = "";
-      if (issueTypeInput) issueTypeInput.value = "";
-      if (priorityInput) priorityInput.value = "Medium";
-      if (categoryInput) categoryInput.value = "";
+      // Clear menu fields
+      if (menuIssueType) menuIssueType.value = "Task";
+      if (menuPortfolio) menuPortfolio.value = "";
+      if (menuReporterSOEID) menuReporterSOEID.value = "";
+      if (menuAssigneeSOEID) menuAssigneeSOEID.value = "";
+      if (menuReporter) menuReporter.value = "";
+      if (menuPlannedStart) menuPlannedStart.value = "";
+      if (menuPlannedEnd) menuPlannedEnd.value = "";
+      if (menuParentID) menuParentID.value = "";
+      if (menuEpicLink) menuEpicLink.value = "";
       resetScreenshot();
       
       // Dispatch event to notify main page
@@ -989,6 +1161,16 @@
       submitStatus.className = "ghost-status submit-status error";
     }
   });
+
+  // Expose methods globally for Launch Widget button
+  window.citiGhostWidget = {
+    openFeedback: (templateData) => {
+      openFeedbackModal(templateData);
+    },
+    removeScreenshot: (index) => {
+      removeScreenshot(index);
+    }
+  };
 
   window.addEventListener("resize", () => {
     if (!menu.classList.contains("hidden")) {

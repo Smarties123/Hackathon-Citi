@@ -38,10 +38,31 @@ def ensure_storage():
             "Epic Link",
             "Evidence Path",
             "Timestamp",
+            "Archive Status",
         ]
         with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(header)
+    else:
+        # Ensure Archive Status column exists in existing CSV
+        try:
+            with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
+                reader = csv.reader(f)
+                header = next(reader, None)
+                if header and "Archive Status" not in header:
+                    # Need to add Archive Status column to existing file
+                    rows = list(reader)
+                    header.append("Archive Status")
+                    with open(CSV_FILE, "w", newline="", encoding="utf-8") as fw:
+                        writer = csv.writer(fw)
+                        writer.writerow(header)
+                        for row in rows:
+                            # Add "active" as default archive status for existing rows
+                            row.append("active")
+                            writer.writerow(row)
+                    logger.info("Added Archive Status column to existing CSV")
+        except Exception as exc:
+            logger.warning("Could not check/update CSV header: %s", exc)
 
 
 ensure_storage()
@@ -61,6 +82,21 @@ def save_screenshot(data_url: str) -> str:
         f.write(image_bytes)
     logger.info("Saved evidence to %s", path)
     return str(path.relative_to(BASE_DIR))
+
+
+def save_screenshots(data_urls: list) -> str:
+    """Save multiple base64 screenshots to disk and return comma-separated paths."""
+    if not data_urls:
+        return ""
+    paths = []
+    for data_url in data_urls:
+        try:
+            path = save_screenshot(data_url)
+            paths.append(path)
+        except Exception as exc:
+            logger.error("Failed to save screenshot: %s", exc)
+            continue
+    return ",".join(paths)  # Store as comma-separated paths
 
 
 def _next_unique_id() -> int:
@@ -112,6 +148,7 @@ def append_feedback(
         epic_link or "",
         evidence_path or "",
         timestamp,
+        "active",  # Default archive status
     ]
     with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -131,37 +168,58 @@ def apply_cors(response):
 @app.route("/screenshots/<path:filename>")
 def serve_screenshot(filename):
     """Serve screenshot files."""
-    return send_from_directory(SCREENSHOT_DIR, filename)
+    return send_from_directory(EVIDENCE_DIR, filename)
 
 
 @app.route("/get-feedback", methods=["GET", "OPTIONS"])
 def get_feedback():
-    """Retrieve all feedback tickets from the Excel file."""
+    """Retrieve all feedback tickets from the CSV file."""
     if request.method == "OPTIONS":
         return ("", 204)
 
     try:
-        wb, sheet = load_sheet()
+        ensure_storage()  # Ensure CSV exists and has correct structure
         tickets = []
 
-        # Skip header row (row 1)
-        for row in sheet.iter_rows(min_row=2, values_only=True):
-            if row[0]:  # If ticket ID exists
-                # Handle old format (without archive status) - default to "active"
-                archive_status = row[10] if len(row) > 10 else "active"
-                tickets.append({
-                    "ticket_id": row[0],
-                    "role": row[1] or "Client",
-                    "url": row[2] or "",
-                    "description": row[3] or "",
-                    "screenshot_path": row[4] or "",
-                    "user_agent": row[5] or "",
-                    "timestamp": row[6] or "",
-                    "issue_type": row[7] if len(row) > 7 else "",
-                    "priority": row[8] if len(row) > 8 else "",
-                    "category": row[9] if len(row) > 9 else "",
-                    "archive_status": archive_status,
-                })
+        with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                ticket_id = row.get("Unique ID", "").strip()
+                if ticket_id:
+                    # Get archive status, default to "active" if not present
+                    archive_status = row.get("Archive Status", "active").strip() or "active"
+                    
+                    # Map CSV columns to API response format
+                    # Note: role is not in CSV, so we'll use a default or derive from reporter
+                    role = "Client"  # Default role since it's not stored in CSV
+                    
+                    # Handle multiple evidence paths (comma-separated)
+                    evidence_path = row.get("Evidence Path", "").strip()
+                    screenshot_paths = [p.strip() for p in evidence_path.split(",") if p.strip()] if evidence_path else []
+                    
+                    tickets.append({
+                        "ticket_id": int(ticket_id) if ticket_id.isdigit() else ticket_id,
+                        "role": role,
+                        "url": "",  # Not stored in CSV
+                        "description": row.get("Description", "").strip(),
+                        "summary": row.get("Summary", "").strip(),
+                        "screenshot_path": screenshot_paths[0] if screenshot_paths else "",  # First screenshot for backward compatibility
+                        "screenshot_paths": screenshot_paths,  # All screenshots
+                        "user_agent": "",  # Not stored in CSV
+                        "timestamp": row.get("Timestamp", "").strip(),
+                        "issue_type": row.get("Issue Type", "").strip(),
+                        "priority": "",  # Not stored in CSV
+                        "category": "",  # Not stored in CSV
+                        "portfolio": row.get("Portfolio", "").strip(),
+                        "reporter_soeid": row.get("Reporter SOEID", "").strip(),
+                        "assignee_soeid": row.get("Assignee SOEID", "").strip(),
+                        "reporter": row.get("Reporter", "").strip(),
+                        "planned_start": row.get("Planned Start", "").strip(),
+                        "planned_end": row.get("Planned End", "").strip(),
+                        "parent_id": row.get("Parent ID", "").strip(),
+                        "epic_link": row.get("Epic Link", "").strip(),
+                        "archive_status": archive_status,
+                    })
 
         # Reverse to show newest first
         tickets.reverse()
@@ -179,33 +237,40 @@ def submit_feedback():
     payload = request.get_json(force=True, silent=True) or {}
     # Map incoming payload to our CSV-backed append_feedback function
     summary = payload.get("summary", "").strip() or payload.get("description", "").strip()
-    issue_type = payload.get("issue_type", "Task")
+    issue_type = payload.get("issue_type", "Task").strip()
     description = payload.get("description", "").strip()
-    portfolio = payload.get("portfolio")
-    reporter_soeid = payload.get("reporter_soeid")
-    assignee_soeid = payload.get("assignee_soeid")
-    reporter = payload.get("reporter")
-    planned_start = payload.get("planned_start")
-    planned_end = payload.get("planned_end")
-    parent_id = payload.get("parent_id")
-    epic_link = payload.get("epic_link")
+    portfolio = payload.get("portfolio", "").strip() or None
+    reporter_soeid = payload.get("reporter_soeid", "").strip() or None
+    assignee_soeid = payload.get("assignee_soeid", "").strip() or None
+    reporter = payload.get("reporter", "").strip() or None
+    planned_start = payload.get("planned_start", "").strip() or None
+    planned_end = payload.get("planned_end", "").strip() or None
+    parent_id = payload.get("parent_id", "").strip() or None
+    epic_link = payload.get("epic_link", "").strip() or None
     url = payload.get("url", "").strip()
     user_agent = payload.get("userAgent", "Unknown")
-    screenshot_data = payload.get("screenshot")
-    issue_type = payload.get("issueType", "").strip()
-    priority = payload.get("priority", "").strip()
-    category = payload.get("category", "").strip()
+    screenshot_data = payload.get("screenshot")  # Can be single string or array
+    screenshots_data = payload.get("screenshots", [])  # Array of screenshots
 
     if not description and not summary:
         logger.warning("Description or summary missing from payload")
         return jsonify({"status": "error", "message": "Description or summary is required"}), 400
 
     evidence_path = ""
+    # Handle both single screenshot (backward compatibility) and multiple screenshots
+    all_screenshots = []
     if screenshot_data:
+        all_screenshots.append(screenshot_data)
+    if screenshots_data and isinstance(screenshots_data, list):
+        all_screenshots.extend(screenshots_data)
+    
+    if all_screenshots:
         try:
-            evidence_path = save_screenshot(screenshot_data)
+            evidence_path = save_screenshots(all_screenshots)
+            if not evidence_path:
+                logger.warning("No screenshots were successfully saved")
         except Exception as exc:  # broad to ensure request still stored
-            logger.error("Failed to save screenshot: %s", exc)
+            logger.error("Failed to save screenshots: %s", exc)
             return (
                 jsonify({"status": "error", "message": "Invalid screenshot data"}),
                 400,
@@ -233,9 +298,9 @@ def submit_feedback():
     return jsonify({"status": "success", "ticket_id": ticket_id, "timestamp": timestamp})
 
 
-@app.route("/archive-feedback", methods=["PUT", "OPTIONS"])
-def archive_feedback():
-    """Archive or unarchive a feedback ticket."""
+@app.route("/update-archive-status", methods=["PUT", "OPTIONS"])
+def update_archive_status():
+    """Update the archive status of a feedback ticket."""
     if request.method == "OPTIONS":
         return ("", 204)
 
@@ -247,23 +312,31 @@ def archive_feedback():
         return jsonify({"status": "error", "message": "Ticket ID is required"}), 400
 
     try:
-        wb, sheet = load_sheet()
+        ensure_storage()  # Ensure CSV exists and has correct structure
         
-        # Find the ticket by ID
+        # Read all rows
+        rows = []
+        header = None
         found = False
-        for row_idx in range(2, sheet.max_row + 1):
-            if sheet.cell(row=row_idx, column=1).value == ticket_id:
-                # Ensure Archive Status column exists
-                if sheet.max_column < 11:
-                    sheet.cell(row=1, column=11, value="Archive Status")
-                sheet.cell(row=row_idx, column=11, value=archive_status)
-                found = True
-                break
+        
+        with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            header = reader.fieldnames
+            for row in reader:
+                if str(row.get("Unique ID", "")).strip() == str(ticket_id):
+                    row["Archive Status"] = archive_status
+                    found = True
+                rows.append(row)
 
         if not found:
             return jsonify({"status": "error", "message": "Ticket not found"}), 404
 
-        wb.save(TICKETS_FILE)
+        # Write back to CSV
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(rows)
+
         logger.info("Updated ticket %s archive status to %s", ticket_id, archive_status)
         return jsonify({"status": "success", "ticket_id": ticket_id, "archive_status": archive_status})
     except Exception as exc:

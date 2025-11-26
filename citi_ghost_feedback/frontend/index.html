@@ -44,7 +44,7 @@
             <circle cx="12" cy="12" r="3"></circle>
           </svg>
         </button>
-        <button class="ghost-btn">Launch Widget</button>
+        <button class="ghost-btn" id="launchWidgetBtn">Launch Widget</button>
       </div>
     </header>
 
@@ -381,17 +381,17 @@
               <div class="templates-list">
                 <div class="template-item">
                   <strong>Bug Report</strong>
-                  <p>Report a bug or issue with detailed steps to reproduce.</p>
+                  <p>Comprehensive template for reporting bugs with detailed steps to reproduce, expected vs actual behavior, environment details, error messages, and additional context. Includes structured sections for easy Jira ticket creation.</p>
                   <button class="template-use-btn">Use Template</button>
                 </div>
                 <div class="template-item">
                   <strong>Feature Request</strong>
-                  <p>Suggest a new feature or improvement.</p>
+                  <p>Detailed template for requesting new features or enhancements. Includes use case, expected benefits, proposed solution, user impact analysis, and related context. Perfect for product planning and prioritization.</p>
                   <button class="template-use-btn">Use Template</button>
                 </div>
                 <div class="template-item">
                   <strong>Performance Issue</strong>
-                  <p>Report performance problems or latency issues.</p>
+                  <p>In-depth template for reporting performance problems and latency issues. Includes timing measurements, impact analysis, environment details, and performance benchmarks. Helps identify bottlenecks quickly.</p>
                   <button class="template-use-btn">Use Template</button>
                 </div>
               </div>
@@ -674,65 +674,9 @@
           </div>
         </div>
 
-      </section>
-
-        <!-- Feedback form integrated with backend /submit-feedback -->
-        <section class="feedback-panel">
-          <div class="card feedback-card">
-            <div class="card-header">
-              <h3>Submit Feedback (Demo)</h3>
-            </div>
-            <form id="feedbackForm">
-              <div class="form-row">
-                <label>Summary <input type="text" name="summary" id="summary" required /></label>
-                <label>Issue Type
-                  <select name="issue_type" id="issue_type">
-                    <option>Bug</option>
-                    <option>Task</option>
-                    <option>Story</option>
-                    <option>Incident</option>
-                  </select>
-                </label>
-              </div>
-              <div class="form-row">
-                <label>Description (required)</label>
-                <textarea name="description" id="description" rows="3" required></textarea>
-              </div>
-
-              <div class="form-row">
-                <label>Portfolio <input type="text" name="portfolio" id="portfolio" /></label>
-                <label>Reporter SOEID <input type="text" name="reporter_soeid" id="reporter_soeid" /></label>
-              </div>
-
-              <div class="form-row">
-                <label>Assignee SOEID <input type="text" name="assignee_soeid" id="assignee_soeid" /></label>
-                <label>Reporter <input type="text" name="reporter" id="reporter" /></label>
-              </div>
-
-              <div class="form-row">
-                <label>Planned Start <input type="date" name="planned_start" id="planned_start" /></label>
-                <label>Planned End <input type="date" name="planned_end" id="planned_end" /></label>
-              </div>
-
-              <div class="form-row">
-                <label>Parent ID <input type="text" name="parent_id" id="parent_id" /></label>
-                <label>Epic Link <input type="text" name="epic_link" id="epic_link" /></label>
-              </div>
-
-              <div class="form-row">
-                <label>Attach Screenshot (optional)
-                  <input type="file" id="screenshotFile" accept="image/*" />
-                </label>
-              </div>
-
-              <div class="form-row">
-                <button type="submit" class="ghost-btn">Submit Feedback</button>
-              </div>
-            </form>
-          </div>
         </section>
 
-      <section class="sample-panel">
+        <section class="sample-panel">
         <div class="sample-view active" data-view="trader">
           <div class="panel-header">
             <h2>Trader Control Room</h2>
@@ -912,7 +856,7 @@
     </main>
 
     <script src="html2canvas.min.js"></script>
-    <script src="widget.js"></script>
+    <script src="widget.js?v=2.0"></script>
     <script>
       const tabs = document.querySelectorAll(".tab");
       const views = document.querySelectorAll(".sample-view");
@@ -1051,7 +995,8 @@
                     <span class="feedback-role">${item.role || "Client"}</span>
                     <span class="feedback-time">${formatDate(date)}</span>
                   </div>
-                  <div class="feedback-description">${item.description || "No description"}</div>
+                  <div class="feedback-description">${escapeHtml(item.summary || item.description || "No description")}</div>
+                  ${item.issue_type ? `<div style="font-size: 0.75rem; color: var(--accent-cyan); margin-top: 0.25rem;">Type: ${escapeHtml(item.issue_type)}</div>` : ""}
                   ${item.ticket_id ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.5rem;">Ticket #${item.ticket_id}</div>` : ""}
                   <div class="feedback-item-actions" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem;">
                     <button class="archive-action-btn archive-btn" onclick="updateArchiveStatus(${item.ticket_id}, 'archived')" title="Archive this item" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">📦 Archive</button>
@@ -1135,26 +1080,51 @@
         const galleryGrid = document.getElementById("galleryGrid");
         if (!galleryGrid) return;
 
-        // Filter items with screenshots
-        const withScreenshots = data.filter(item => item.screenshot_path);
+        // Collect all screenshots from all feedback items
+        const allScreenshots = [];
         
-        if (withScreenshots.length === 0) {
-          galleryGrid.innerHTML = '<p class="empty-state">No screenshots available yet.</p>';
-        } else {
-          galleryGrid.innerHTML = withScreenshots.slice(0, 12).map((item) => {
-            // Screenshot path is relative to backend, need to construct full URL
+        data.forEach((item) => {
+          const ticketId = item.ticket_id;
+          // Handle multiple screenshots (comma-separated paths or array)
+          let screenshotPaths = [];
+          
+          if (item.screenshot_paths && Array.isArray(item.screenshot_paths)) {
+            screenshotPaths = item.screenshot_paths;
+          } else {
+            const evidencePath = item.screenshot_path || item.evidence_path || "";
+            if (evidencePath) {
+              // Split comma-separated paths
+              screenshotPaths = evidencePath.split(',').map(p => p.trim()).filter(p => p);
+            }
+          }
+          
+          screenshotPaths.forEach((path) => {
             let screenshotUrl;
-            if (item.screenshot_path.startsWith('http')) {
-              screenshotUrl = item.screenshot_path;
-            } else if (item.screenshot_path.startsWith('screenshots/')) {
-              screenshotUrl = `${API_BASE}/${item.screenshot_path}`;
+            if (path.startsWith('http')) {
+              screenshotUrl = path;
+            } else if (path.startsWith('evidence/')) {
+              screenshotUrl = `${API_BASE}/screenshots/${path.split('/').pop()}`;
+            } else if (path.includes('/')) {
+              screenshotUrl = `${API_BASE}/screenshots/${path.split('/').pop()}`;
             } else {
-              screenshotUrl = `${API_BASE}/screenshots/${item.screenshot_path.split('/').pop()}`;
+              screenshotUrl = `${API_BASE}/screenshots/${path}`;
             }
             
+            allScreenshots.push({
+              url: screenshotUrl,
+              ticketId: ticketId
+            });
+          });
+        });
+        
+        if (allScreenshots.length === 0) {
+          galleryGrid.innerHTML = '<p class="empty-state">No screenshots available yet.</p>';
+        } else {
+          // Show up to 24 screenshots
+          galleryGrid.innerHTML = allScreenshots.slice(0, 24).map((screenshot) => {
             return `
-              <div class="gallery-item" onclick="window.open('${screenshotUrl}', '_blank')">
-                <img src="${screenshotUrl}" alt="Screenshot for ticket ${item.ticket_id}" onerror="this.style.display='none'">
+              <div class="gallery-item" onclick="window.open('${screenshot.url}', '_blank')">
+                <img src="${screenshot.url}" alt="Screenshot for ticket ${screenshot.ticketId}" onerror="this.style.display='none'">
               </div>
             `;
           }).join("");
@@ -1353,26 +1323,104 @@
       const templates = {
         "Bug Report": {
           issueType: "Bug",
-          priority: "High",
-          category: "",
-          description: "Brief description of the bug",
-          details: "Steps to Reproduce:\n1. \n2. \n3. \n\nExpected Behavior:\n\nActual Behavior:\n\nEnvironment:\n- Browser: \n- OS: ",
+          summary: "Bug: Application error when [describe the action]",
+          description: `**Issue Summary:**
+Application encounters an error when [describe the specific action or scenario].
+
+**Steps to Reproduce:**
+1. Navigate to [specific page/feature]
+2. Perform [specific action]
+3. Observe the error
+
+**Expected Behavior:**
+[Describe what should happen]
+
+**Actual Behavior:**
+[Describe what actually happens, including any error messages]
+
+**Environment:**
+- Browser: [e.g., Chrome 120, Firefox 121]
+- OS: [e.g., Windows 11, macOS 14.2]
+- Application Version: [if applicable]
+- Screen Resolution: [if relevant]
+
+**Error Messages/Logs:**
+[Paste any error messages, console logs, or stack traces here]
+
+**Additional Context:**
+- Frequency: [Always / Sometimes / Rarely]
+- First Occurred: [Date/Time]
+- Workaround: [If any exists]`,
           role: "Client"
         },
         "Feature Request": {
-          issueType: "Feature Request",
-          priority: "Medium",
-          category: "",
-          description: "Brief description of the requested feature",
-          details: "Use Case:\n\nExpected Benefits:\n\nAdditional Context:",
+          issueType: "Story",
+          summary: "Feature: Add [describe the feature]",
+          description: `**Feature Overview:**
+Request to add [describe the new feature or enhancement].
+
+**Use Case:**
+[Describe the specific scenario or user need this feature would address]
+
+**Expected Benefits:**
+- [Benefit 1: e.g., Improved user experience]
+- [Benefit 2: e.g., Time savings]
+- [Benefit 3: e.g., Better data accuracy]
+
+**Proposed Solution:**
+[Describe how you envision this feature working]
+
+**User Impact:**
+- Target Users: [Who would use this feature?]
+- Usage Frequency: [How often would this be used?]
+- Priority: [High / Medium / Low]
+
+**Additional Context:**
+- Related Features: [Any existing features this relates to]
+- Examples: [Any similar features in other applications]
+- Mockups/Wireframes: [If available]`,
           role: "Client"
         },
         "Performance Issue": {
-          issueType: "Performance",
-          priority: "High",
-          category: "",
-          description: "Brief description of the performance issue",
-          details: "When does it occur:\n\nImpact:\n\nSteps to Reproduce:\n1. \n2. \n\nExpected Performance:\n\nActual Performance:",
+          issueType: "Bug",
+          summary: "Performance: Slow response when [describe the action]",
+          description: `**Performance Issue Summary:**
+Application experiences slow performance or latency when [describe the specific action or scenario].
+
+**When Does It Occur:**
+- Specific Page/Feature: [Which part of the application]
+- Time of Day: [If relevant]
+- User Actions: [What triggers the slowdown]
+
+**Impact:**
+- User Experience: [How does this affect users?]
+- Business Impact: [Any business consequences?]
+- Frequency: [Always / Sometimes / Rarely]
+
+**Steps to Reproduce:**
+1. Navigate to [specific page/feature]
+2. Perform [specific action]
+3. Measure the performance
+
+**Expected Performance:**
+- Expected Load Time: [e.g., < 2 seconds]
+- Expected Response Time: [e.g., < 500ms]
+
+**Actual Performance:**
+- Actual Load Time: [e.g., 15 seconds]
+- Actual Response Time: [e.g., 5 seconds]
+- Network Tab Screenshot: [If available]
+
+**Environment:**
+- Browser: [e.g., Chrome 120]
+- OS: [e.g., Windows 11]
+- Network: [WiFi / Ethernet / Mobile]
+- Device: [Desktop / Laptop / Mobile]
+
+**Additional Context:**
+- Number of Records: [If applicable, e.g., loading 10,000 rows]
+- Concurrent Users: [If known]
+- Server Load: [If available]`,
           role: "Client"
         }
       };
@@ -1471,7 +1519,7 @@
       // Archive functionality
       async function updateArchiveStatus(ticketId, status) {
         try {
-          const response = await fetch(`${API_BASE}/archive-feedback`, {
+          const response = await fetch(`${API_BASE}/update-archive-status`, {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
@@ -1853,89 +1901,37 @@
       }
 
       // Listen for new feedback submissions
-      window.addEventListener("feedbackSubmitted", (event) => {
-        setTimeout(() => loadFeedback(), 500); // Small delay to ensure backend has processed
+      window.addEventListener("feedbackSubmitted", async (event) => {
+        console.log("Feedback submitted event received:", event.detail);
+        // Small delay to ensure backend has processed the submission
+        setTimeout(async () => {
+          try {
+            // This updates all sections: View Feedback, Analytics, Gallery, Activity Log, Notifications
+            await loadFeedback();
+            // Also reload archive if it's currently visible
+            if (typeof loadArchive === 'function') {
+              loadArchive();
+            }
+            console.log("All sections updated after feedback submission");
+          } catch (error) {
+            console.error("Error updating sections after feedback submission:", error);
+          }
+        }, 500);
       });
 
       // Auto-refresh every 30 seconds
       setInterval(() => {
         loadFeedback();
       }, 30000);
-    </script>
-    <script>
-      // Feedback form submission: convert optional file to base64 data URL and POST JSON
-      (function () {
-        const form = document.getElementById("feedbackForm");
-        const fileInput = document.getElementById("screenshotFile");
 
-        function readFileAsDataURL(file) {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
+      // Launch Widget button - opens the Citi Snap widget
+      document.getElementById("launchWidgetBtn")?.addEventListener("click", () => {
+        if (window.citiGhostWidget) {
+          window.citiGhostWidget.openFeedback();
+        } else {
+          alert("Citi Snap widget is loading. Please wait a moment and try again.");
         }
-
-        form.addEventListener("submit", async (ev) => {
-          ev.preventDefault();
-          const summary = document.getElementById("summary").value.trim();
-          const issue_type = document.getElementById("issue_type").value;
-          const description = document.getElementById("description").value.trim();
-          if (!description) {
-            alert("Description is required");
-            return;
-          }
-
-          const payload = {
-            summary,
-            issue_type,
-            description,
-            portfolio: document.getElementById("portfolio").value.trim(),
-            reporter_soeid: document.getElementById("reporter_soeid").value.trim(),
-            assignee_soeid: document.getElementById("assignee_soeid").value.trim(),
-            reporter: document.getElementById("reporter").value.trim(),
-            planned_start: document.getElementById("planned_start").value || null,
-            planned_end: document.getElementById("planned_end").value || null,
-            parent_id: document.getElementById("parent_id").value.trim(),
-            epic_link: document.getElementById("epic_link").value.trim(),
-            url: location.href,
-            userAgent: navigator.userAgent,
-          };
-
-          const file = fileInput.files && fileInput.files[0];
-          if (file) {
-            try {
-              const dataUrl = await readFileAsDataURL(file);
-              payload.screenshot = dataUrl;
-            } catch (err) {
-              console.error("Failed reading file:", err);
-              alert("Failed to read screenshot file");
-              return;
-            }
-          }
-
-          console.log("Submitting payload:", payload);
-
-          try {
-            const res = await fetch("/submit-feedback", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            });
-            const body = await res.json();
-            if (res.ok) {
-              alert(`Feedback submitted — ticket id: ${body.ticket_id}`);
-              form.reset();
-            } else {
-              alert(`Error: ${body.message || JSON.stringify(body)}`);
-            }
-          } catch (err) {
-            console.error(err);
-            alert("Network or server error when submitting feedback");
-          }
-        });
-      })();
+      });
     </script>
   </body>
 </html>
