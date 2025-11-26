@@ -39,28 +39,41 @@ def ensure_storage():
             "Evidence Path",
             "Timestamp",
             "Archive Status",
+            "Board Status",
         ]
         with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
             writer = csv.writer(f)
             writer.writerow(header)
     else:
-        # Ensure Archive Status column exists in existing CSV
+        # Ensure Archive Status and Board Status columns exist in existing CSV
         try:
             with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
                 reader = csv.reader(f)
                 header = next(reader, None)
+                rows = list(reader)
+                updated = False
+                
                 if header and "Archive Status" not in header:
-                    # Need to add Archive Status column to existing file
-                    rows = list(reader)
                     header.append("Archive Status")
+                    updated = True
+                    for row in rows:
+                        # Add "active" as default archive status for existing rows
+                        row.append("active")
+                    logger.info("Added Archive Status column to existing CSV")
+                
+                if header and "Board Status" not in header:
+                    header.append("Board Status")
+                    updated = True
+                    for row in rows:
+                        # Add "backlog" as default board status for existing rows
+                        row.append("backlog")
+                    logger.info("Added Board Status column to existing CSV")
+                
+                if updated:
                     with open(CSV_FILE, "w", newline="", encoding="utf-8") as fw:
                         writer = csv.writer(fw)
                         writer.writerow(header)
-                        for row in rows:
-                            # Add "active" as default archive status for existing rows
-                            row.append("active")
-                            writer.writerow(row)
-                    logger.info("Added Archive Status column to existing CSV")
+                        writer.writerows(rows)
         except Exception as exc:
             logger.warning("Could not check/update CSV header: %s", exc)
 
@@ -149,6 +162,7 @@ def append_feedback(
         evidence_path or "",
         timestamp,
         "active",  # Default archive status
+        "backlog",  # Default board status
     ]
     with open(CSV_FILE, "a", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
@@ -188,6 +202,7 @@ def get_feedback():
                 if ticket_id:
                     # Get archive status, default to "active" if not present
                     archive_status = row.get("Archive Status", "active").strip() or "active"
+                    board_status = row.get("Board Status", "backlog").strip() or "backlog"
                     
                     # Map CSV columns to API response format
                     # Note: role is not in CSV, so we'll use a default or derive from reporter
@@ -219,6 +234,7 @@ def get_feedback():
                         "parent_id": row.get("Parent ID", "").strip(),
                         "epic_link": row.get("Epic Link", "").strip(),
                         "archive_status": archive_status,
+                        "board_status": board_status,
                     })
 
         # Reverse to show newest first
@@ -227,6 +243,57 @@ def get_feedback():
     except Exception as exc:
         logger.exception("Unable to load tickets: %s", exc)
         return jsonify({"status": "error", "message": "Failed to load feedback"}), 500
+
+
+@app.route("/update-ticket-status", methods=["PUT", "OPTIONS"])
+def update_ticket_status():
+    """Update the board status of a ticket."""
+    if request.method == "OPTIONS":
+        return ("", 204)
+
+    try:
+        payload = request.get_json(force=True, silent=True) or {}
+        ticket_id = payload.get("ticket_id")
+        board_status = payload.get("board_status", "backlog").strip()
+
+        if not ticket_id:
+            response = jsonify({"status": "error", "message": "ticket_id is required"})
+            return apply_cors(response), 400
+
+        # Read all rows
+        rows = []
+        header = None
+        with open(CSV_FILE, "r", newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            header = reader.fieldnames
+            rows = list(reader)
+
+        # Find and update the ticket
+        updated = False
+        for row in rows:
+            if str(row.get("Unique ID", "")) == str(ticket_id):
+                row["Board Status"] = board_status
+                updated = True
+                break
+
+        if not updated:
+            response = jsonify({"status": "error", "message": f"Ticket {ticket_id} not found"})
+            return apply_cors(response), 404
+
+        # Write back to CSV
+        with open(CSV_FILE, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+            writer.writerows(rows)
+
+        logger.info("Updated ticket %s board status to %s", ticket_id, board_status)
+        response = jsonify({"status": "success", "ticket_id": ticket_id, "board_status": board_status})
+        return apply_cors(response)
+
+    except Exception as exc:
+        logger.exception("Failed to update ticket status: %s", exc)
+        response = jsonify({"status": "error", "message": "Failed to update ticket status"})
+        return apply_cors(response), 500
 
 
 @app.route("/submit-feedback", methods=["POST", "OPTIONS"])

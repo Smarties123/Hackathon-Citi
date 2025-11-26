@@ -1,13 +1,13 @@
-Unique ID,Summary,Issue Type,Description,Portfolio,Reporter SOEID,Assignee SOEID,Reporter,Planned Start,Planned End,Parent ID,Epic Link,Evidence Path,Timestamp,Archive Status
-1,Automated test submission,Bug,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_150013_eb2ccfd9.png,2025-11-24 15:00:13,active
-2,Automated test submission,,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_160658_1ccbc7ee.png,2025-11-24 16:06:58,active
-3,sdsds,Story,dads,sss,dads,dads,dsds,2025-11-15,2025-11-19,dsds,dsdsdsds,,2025-11-24 21:40:38,active
-4,dads,Task,ssd,dads,dads,sds,dads,,,did,dsdsds,,2025-11-24 21:44:22,active
-5,fhjaf,Task,fafda,fdsfd,feds,fdsf,fdsf,,,fdsf,fds,"evidence/20251126_103325_bcfea10e.png,evidence/20251126_103325_6c9f3481.png,evidence/20251126_103325_fb7b4fc9.png",2025-11-26 10:33:25,active
-6,HKJHKJH,Task,HKJHKJH,,,,,,,,,"evidence/20251126_103635_98ae10c5.png,evidence/20251126_103635_9025c077.png,evidence/20251126_103635_59a5c41c.png",2025-11-26 10:36:35,active
-7,days,Task,days,,,,,,,,,"evidence/20251126_104018_883ae5d9.png,evidence/20251126_104018_85a2efa7.png,evidence/20251126_104018_b06d878d.png,evidence/20251126_104018_be263acc.png",2025-11-26 10:40:18,active
-8,ddssd,Task,dsdsds,,,,,,,,,,2025-11-26 11:02:20,active
-9,ufhfjfherjf,Task,ferufgrejf,nerf,free,rferg,frefer,,,rfe,ferkfher,,2025-11-26 11:03:29,active
-10,cfrcfrcfc,Task,cfrcrfccf,,,,,,,,,,2025-11-26 11:06:40,active
-11,sasas,Task,saas,,saas,,sas,,,,,,2025-11-26 11:18:45,resolved
-12,dad,Task,dad,,dad,,dad,,,,,,2025-11-26 11:37:43,archived
+Unique ID,Summary,Issue Type,Description,Portfolio,Reporter SOEID,Assignee SOEID,Reporter,Planned Start,Planned End,Parent ID,Epic Link,Evidence Path,Timestamp,Archive Status,Board Status
+1,Automated test submission,Bug,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_150013_eb2ccfd9.png,2025-11-24 15:00:13,active,backlog
+2,Automated test submission,,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_160658_1ccbc7ee.png,2025-11-24 16:06:58,active,backlog
+3,sdsds,Story,dads,sss,dads,dads,dsds,2025-11-15,2025-11-19,dsds,dsdsdsds,,2025-11-24 21:40:38,active,backlog
+4,dads,Task,ssd,dads,dads,sds,dads,,,did,dsdsds,,2025-11-24 21:44:22,active,backlog
+5,fhjaf,Task,fafda,fdsfd,feds,fdsf,fdsf,,,fdsf,fds,"evidence/20251126_103325_bcfea10e.png,evidence/20251126_103325_6c9f3481.png,evidence/20251126_103325_fb7b4fc9.png",2025-11-26 10:33:25,active,backlog
+6,HKJHKJH,Task,HKJHKJH,,,,,,,,,"evidence/20251126_103635_98ae10c5.png,evidence/20251126_103635_9025c077.png,evidence/20251126_103635_59a5c41c.png",2025-11-26 10:36:35,active,backlog
+7,days,Task,days,,,,,,,,,"evidence/20251126_104018_883ae5d9.png,evidence/20251126_104018_85a2efa7.png,evidence/20251126_104018_b06d878d.png,evidence/20251126_104018_be263acc.png",2025-11-26 10:40:18,active,backlog
+8,ddssd,Task,dsdsds,,,,,,,,,,2025-11-26 11:02:20,active,blocked
+9,ufhfjfherjf,Task,ferufgrejf,nerf,free,rferg,frefer,,,rfe,ferkfher,,2025-11-26 11:03:29,active,backlog
+10,cfrcfrcfc,Task,cfrcrfccf,,,,,,,,,,2025-11-26 11:06:40,active,inprogress
+11,sasas,Task,saas,,saas,,sas,,,,,,2025-11-26 11:18:45,resolved,backlog
+12,dad,Task,dad,,dad,,dad,,,,,,2025-11-26 11:37:43,archived,todo

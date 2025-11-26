@@ -679,18 +679,38 @@
         return false;
       }
 
-      // Update ticket status (would call backend API in real implementation)
+      // Update ticket status - persist to backend
       async function updateTicketStatus(ticketId, newStatus, oldStatus) {
-        // In a real implementation, you'd call the backend API here
-        // For now, we'll just update locally
         console.log(`Moving ticket ${ticketId} from ${oldStatus} to ${newStatus}`);
         
-        // You could add a backend endpoint like:
-        // await fetch(`${API_BASE}/update-ticket-status`, {
-        //   method: "PUT",
-        //   headers: { "Content-Type": "application/json" },
-        //   body: JSON.stringify({ ticket_id: ticketId, board_status: newStatus })
-        // });
+        try {
+          const response = await fetch(`${API_BASE}/update-ticket-status`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ ticket_id: ticketId, board_status: newStatus })
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({ message: "Failed to update ticket status" }));
+            console.error("Failed to update ticket status:", errorData.message);
+            // Revert the change if backend update failed
+            const ticket = allTickets.find(t => t.ticket_id == ticketId);
+            if (ticket) {
+              ticket.board_status = oldStatus;
+              renderBoard();
+            }
+          } else {
+            console.log(`Successfully updated ticket ${ticketId} to ${newStatus}`);
+          }
+        } catch (error) {
+          console.error("Error updating ticket status:", error);
+          // Revert the change if backend update failed
+          const ticket = allTickets.find(t => t.ticket_id == ticketId);
+          if (ticket) {
+            ticket.board_status = oldStatus;
+            renderBoard();
+          }
+        }
       }
 
       // Format date
@@ -827,13 +847,16 @@
       }
 
       // Show add to backlog dialog
-      function showAddToBacklog() {
+      async function showAddToBacklog() {
         const ticketId = prompt("Enter ticket ID to add to backlog (e.g., 1, 2, 3):");
         if (ticketId) {
           const ticket = allTickets.find(t => t.ticket_id == ticketId);
           if (ticket) {
+            const oldStatus = ticket.board_status || "backlog";
             ticket.board_status = "backlog";
             renderBoard();
+            // Persist to backend
+            await updateTicketStatus(ticketId, "backlog", oldStatus);
           } else {
             alert(`Ticket CITI-${ticketId} not found`);
           }
@@ -852,7 +875,7 @@
           // Initialize board_status if not present (default to backlog)
           allTickets.forEach(ticket => {
             if (!ticket.board_status) {
-              ticket.board_status = "backlog";
+              ticket.board_status = ticket.board_status || "backlog";
             }
           });
           
