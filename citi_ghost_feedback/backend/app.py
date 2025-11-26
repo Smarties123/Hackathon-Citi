@@ -8,13 +8,24 @@ from typing import Optional
 
 from flask import Flask, jsonify, request, send_from_directory
 BASE_DIR = Path(__file__).resolve().parent
+FRONTEND_DIR = BASE_DIR.parent / "frontend"
 EVIDENCE_DIR = BASE_DIR / "evidence"
 CSV_FILE = BASE_DIR / "feedback_storage.csv"
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("citi_ghost_feedback")
 
-app = Flask(__name__)
+# Serve frontend static files from the sibling `frontend` directory.
+# Using static_url_path="" mounts static files at the root (so /index.html
+# and other assets are served). We still add an explicit route for '/'
+# to return index.html.
+app = Flask(__name__, static_folder=str(FRONTEND_DIR), static_url_path="")
+
+
+@app.route("/", methods=["GET"])
+def index():
+    # Serve the frontend index.html at the root URL
+    return app.send_static_file("index.html")
 
 
 def ensure_storage():
