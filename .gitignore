@@ -12,6 +12,7 @@ env/
 # --- Citi Ghost backend artifacts ---
 citi_ghost_feedback/backend/tickets.xlsx
 citi_ghost_feedback/backend/screenshots/
+citi_ghost_feedback/backend/evidence/
 
 # If you ever see .pytest_cache or similar
 .pytest_cache/

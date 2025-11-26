@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jira - Citi Snap Tickets</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      /* Jira Header - Match main page style */
+      .jira-header {
+        background: linear-gradient(120deg, #0d152b, #101a31 70%, #0a1224);
+        color: var(--text-primary);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .jira-header-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .jira-logo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .jira-logo .ghost-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: radial-gradient(circle at 30% 30%, #2daef7, #255be3 80%);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      }
+
+      .jira-logo .ghost-icon svg {
+        width: 36px;
+        height: 36px;
+        fill: #f4f6fb;
+      }
+
+      .jira-logo .ghost-icon .ghost-eye {
+        fill: #101a31;
+      }
+
+      .jira-nav {
+        display: flex;
+        gap: 0.75rem;
+        margin-left: 2rem;
+      }
+
+      .jira-nav-item {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        border: 1px solid transparent;
+      }
+
+      .jira-nav-item:hover {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+      }
+
+      .jira-nav-item.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      .jira-header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .jira-header-link {
+        color: var(--text-primary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+      }
+
+      .jira-header-link:hover {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      /* Main Container */
+      .jira-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem;
+      }
+
+      /* Page Header */
+      .jira-page-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .jira-page-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .jira-filters {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+
+      .jira-filter-btn {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        transition: all 0.2s;
+      }
+
+      .jira-filter-btn:hover {
+        background: var(--bg-primary);
+        border-color: var(--accent-blue);
+      }
+
+      .jira-filter-btn.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      /* Ticket List */
+      .jira-tickets {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      /* Ticket Card */
+      .jira-ticket {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .jira-ticket:hover {
+        box-shadow: 0 4px 12px rgba(37, 91, 227, 0.2);
+        border-color: var(--accent-blue);
+        transform: translateY(-2px);
+      }
+
+      .jira-ticket-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .jira-ticket-left {
+        flex: 1;
+      }
+
+      .jira-ticket-key {
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      .jira-ticket-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+      }
+
+      .jira-ticket-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+      }
+
+      .jira-ticket-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .jira-ticket-right {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+      }
+
+      /* Labels */
+      .jira-labels {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .jira-label {
+        padding: 2px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .jira-label-bug {
+        background: #e5493a;
+        color: white;
+      }
+
+      .jira-label-story {
+        background: #4bce97;
+        color: white;
+      }
+
+      .jira-label-task {
+        background: #0052cc;
+        color: white;
+      }
+
+      .jira-label-incident {
+        background: #f5cd47;
+        color: #172b4d;
+      }
+
+      .jira-label-portfolio {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+      }
+
+      /* Priority/Avatar */
+      .jira-priority {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .jira-priority-high {
+        background: #e5493a;
+        color: white;
+      }
+
+      .jira-priority-medium {
+        background: #f5cd47;
+        color: #172b4d;
+      }
+
+      .jira-priority-low {
+        background: #dfe1e6;
+        color: #172b4d;
+      }
+
+      /* Ticket Details */
+      .jira-ticket-details {
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border-color);
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        font-size: 13px;
+      }
+
+      .jira-detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .jira-detail-label {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .jira-detail-value {
+        color: var(--text-primary);
+      }
+
+      /* Screenshots */
+      .jira-screenshots {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .jira-screenshot {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .jira-screenshot:hover {
+        transform: scale(1.05);
+        border-color: var(--accent-blue);
+      }
+
+      /* Empty State */
+      .jira-empty {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+      }
+
+      .jira-empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+      }
+
+      /* Loading */
+      .jira-loading {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+      }
+
+      /* Status Badge */
+      .jira-status {
+        padding: 4px 8px;
+        border-radius: 3px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .jira-status-active {
+        background: var(--accent-blue);
+        color: white;
+      }
+
+      .jira-status-resolved {
+        background: #4bce97;
+        color: white;
+      }
+
+      .jira-status-archived {
+        background: #5e6c84;
+        color: white;
+      }
+
+      .jira-status-closed {
+        background: #dfe1e6;
+        color: #172b4d;
+      }
+
+      /* Ticket Detail Modal */
+      .ticket-detail-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        overflow-y: auto;
+        padding: 2rem;
+      }
+
+      .ticket-detail-modal.active {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .ticket-detail-content {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        max-width: 900px;
+        width: 100%;
+        margin: 2rem auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      .ticket-detail-header {
+        padding: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .ticket-detail-title-section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .ticket-detail-key {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+      }
+
+      .ticket-detail-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .ticket-detail-close:hover {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+
+      .ticket-detail-body {
+        padding: 2rem;
+      }
+
+      .ticket-detail-section {
+        margin-bottom: 2rem;
+      }
+
+      .ticket-detail-section-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .ticket-detail-section-content {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        color: var(--text-primary);
+        line-height: 1.7;
+        font-size: 0.9rem;
+      }
+
+      .ticket-detail-section-content ul,
+      .ticket-detail-section-content ol {
+        margin-left: 1.5rem;
+        margin-top: 0.75rem;
+      }
+
+      .ticket-detail-section-content li {
+        margin-bottom: 0.5rem;
+      }
+
+      .ticket-detail-section-content strong {
+        color: var(--accent-cyan);
+      }
+
+      .ticket-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .ticket-detail-card {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1rem;
+      }
+
+      .ticket-detail-card-title {
+        font-weight: 600;
+        color: var(--accent-cyan);
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+
+      .ticket-detail-card-value {
+        color: var(--text-primary);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Jira Header -->
+    <div class="jira-header">
+      <div class="jira-header-left">
+        <div class="jira-logo">
+          <div class="ghost-icon">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M32 4c13.2 0 22 9.88 22 23.06V60L46 52l-6 8-8-8-8 8-6-8-8 8V27.06C10 13.88 18.8 4 32 4Z" fill="#f4f6fb"></path>
+              <circle cx="24" cy="28" r="4" fill="#101a31"></circle>
+              <circle cx="40" cy="28" r="4" fill="#101a31"></circle>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size: 1.25rem; font-weight: 600;">Citi Snap</div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">Jira Integration</div>
+          </div>
+        </div>
+        <div class="jira-nav">
+          <div class="jira-nav-item active" onclick="window.location.href='jira.html'">Issues</div>
+          <div class="jira-nav-item" onclick="window.location.href='jira-boards.html'">Boards</div>
+        </div>
+      </div>
+      <div class="jira-header-right">
+        <a href="index.html" class="jira-header-link">← Back to Citi Snap</a>
+      </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="jira-container">
+      <!-- Page Header -->
+      <div class="jira-page-header">
+        <div>
+          <h1 class="jira-page-title">Citi Snap Feedback Tickets</h1>
+          <div id="ticketCount" style="font-size: 0.875rem; color: var(--text-secondary); margin-top: 0.5rem;">Loading...</div>
+        </div>
+        <div class="jira-filters">
+          <button class="jira-filter-btn active" data-filter="all">All</button>
+          <button class="jira-filter-btn" data-filter="active">Active</button>
+          <button class="jira-filter-btn" data-filter="resolved">Resolved</button>
+          <button class="jira-filter-btn" data-filter="archived">Archived</button>
+        </div>
+      </div>
+
+      <!-- Tickets List -->
+      <div class="jira-tickets" id="jiraTickets">
+        <div class="jira-loading">Loading tickets...</div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      let allTickets = [];
+      let currentFilter = "all";
+
+      // Format date
+      function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Get issue type label class
+      function getIssueTypeClass(issueType) {
+        const type = (issueType || "Task").toLowerCase();
+        if (type === "bug") return "jira-label-bug";
+        if (type === "story") return "jira-label-story";
+        if (type === "incident") return "jira-label-incident";
+        return "jira-label-task";
+      }
+
+      // Get status class
+      function getStatusClass(status) {
+        const s = (status || "active").toLowerCase();
+        if (s === "resolved") return "jira-status-resolved";
+        if (s === "archived") return "jira-status-archived";
+        if (s === "closed") return "jira-status-closed";
+        return "jira-status-active";
+      }
+
+      // Generate dummy analysis data
+      function generateDummyAnalysis(ticket) {
+        const issueType = (ticket.issue_type || "Task").toLowerCase();
+        
+        // High Level Overview
+        const overviews = {
+          bug: "This bug affects the core functionality of the application, causing users to experience errors when performing critical operations. The issue has been reported by multiple users and impacts the user experience significantly.",
+          story: "This feature request aims to enhance the user experience by adding new capabilities to the platform. It has been identified as a high-priority enhancement that will benefit a large portion of the user base.",
+          task: "This task involves implementing improvements to the existing system infrastructure. It requires coordination between multiple teams and careful planning to ensure minimal disruption to current operations.",
+          incident: "This incident represents a critical system failure that requires immediate attention. The issue has been escalated and is being actively monitored by the operations team."
+        };
+
+        // Root Cause Analysis
+        const rootCauses = {
+          bug: "The root cause appears to be related to improper error handling in the API layer. When invalid data is passed to the endpoint, the system fails to validate inputs correctly, leading to a null pointer exception. This suggests a gap in input validation and error handling mechanisms.",
+          story: "The need for this feature has been identified through user feedback and market research. Current system limitations prevent users from achieving their workflow goals efficiently, creating a gap in functionality that this feature will address.",
+          task: "The task is required due to technical debt accumulated over previous iterations. System performance metrics indicate that optimization is needed to maintain acceptable response times as user load increases.",
+          incident: "Initial investigation points to a database connection pool exhaustion issue. The system is experiencing higher than expected load, causing connection timeouts and cascading failures across dependent services."
+        };
+
+        // Potential Solution
+        const solutions = {
+          bug: "1. Implement comprehensive input validation at the API gateway level\n2. Add proper null checks and error handling in the service layer\n3. Create unit tests to cover edge cases\n4. Deploy fixes to staging environment for thorough testing\n5. Monitor error rates post-deployment to ensure resolution",
+          story: "1. Conduct user research to validate feature requirements\n2. Design user interface mockups and gather stakeholder feedback\n3. Break down implementation into smaller, manageable tasks\n4. Develop feature incrementally with regular testing\n5. Plan for gradual rollout to minimize risk",
+          task: "1. Perform system performance analysis to identify bottlenecks\n2. Optimize database queries and add appropriate indexing\n3. Implement caching strategies where applicable\n4. Consider horizontal scaling if needed\n5. Establish monitoring and alerting for performance metrics",
+          incident: "1. Increase database connection pool size immediately\n2. Implement connection retry logic with exponential backoff\n3. Add circuit breakers to prevent cascading failures\n4. Scale up database resources if necessary\n5. Review and optimize slow-running queries"
+        };
+
+        return {
+          overview: overviews[issueType] || overviews.task,
+          rootCause: rootCauses[issueType] || rootCauses.task,
+          solution: solutions[issueType] || solutions.task
+        };
+      }
+
+      // Render ticket
+      function renderTicket(ticket) {
+        const issueType = ticket.issue_type || "Task";
+        const status = ticket.archive_status || "active";
+        // Handle both screenshot_paths array and single screenshot_path
+        let screenshots = [];
+        if (ticket.screenshot_paths && Array.isArray(ticket.screenshot_paths)) {
+          screenshots = ticket.screenshot_paths;
+        } else if (ticket.screenshot_path) {
+          screenshots = [ticket.screenshot_path];
+        }
+        
+        return `
+          <div class="jira-ticket" data-status="${status}" onclick="openTicketDetail(${ticket.ticket_id})" style="cursor: pointer;">
+            <div class="jira-ticket-header">
+              <div class="jira-ticket-left">
+                <div class="jira-ticket-key">CITI-${ticket.ticket_id}</div>
+                <div class="jira-ticket-title">${ticket.summary || "No summary"}</div>
+                <div class="jira-labels">
+                  <span class="jira-label ${getIssueTypeClass(issueType)}">${issueType}</span>
+                  ${ticket.portfolio ? `<span class="jira-label jira-label-portfolio">${ticket.portfolio}</span>` : ""}
+                  <span class="jira-status ${getStatusClass(status)}">${status}</span>
+                </div>
+                <div class="jira-ticket-meta">
+                  <div class="jira-ticket-meta-item">
+                    <span>Created:</span>
+                    <strong>${formatDate(ticket.timestamp)}</strong>
+                  </div>
+                  ${ticket.reporter ? `<div class="jira-ticket-meta-item"><span>Reporter:</span><strong>${ticket.reporter}</strong></div>` : ""}
+                  ${ticket.reporter_soeid ? `<div class="jira-ticket-meta-item"><span>Reporter SOEID:</span><strong>${ticket.reporter_soeid}</strong></div>` : ""}
+                </div>
+              </div>
+              <div class="jira-ticket-right">
+                <div class="jira-priority jira-priority-medium">!</div>
+              </div>
+            </div>
+            
+            ${screenshots.length > 0 ? `
+              <div class="jira-screenshots">
+                ${screenshots.map(screenshot => {
+                  // Extract filename from path (e.g., "evidence/20251124_150013_eb2ccfd9.png" -> "20251124_150013_eb2ccfd9.png")
+                  const filename = screenshot.includes('/') ? screenshot.split('/').pop() : screenshot;
+                  const screenshotUrl = `${API_BASE}/screenshots/${filename}`;
+                  return `<img src="${screenshotUrl}" alt="Screenshot" class="jira-screenshot" onclick="event.stopPropagation(); window.open('${screenshotUrl}', '_blank')" onerror="console.error('Failed to load screenshot:', '${screenshotUrl}'); this.style.display='none';" />`;
+                }).join("")}
+              </div>
+            ` : ""}
+            
+            <div class="jira-ticket-details">
+              ${ticket.assignee_soeid ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Assignee SOEID</span>
+                  <span class="jira-detail-value">${ticket.assignee_soeid}</span>
+                </div>
+              ` : ""}
+              ${ticket.planned_start ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Planned Start</span>
+                  <span class="jira-detail-value">${ticket.planned_start}</span>
+                </div>
+              ` : ""}
+              ${ticket.planned_end ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Planned End</span>
+                  <span class="jira-detail-value">${ticket.planned_end}</span>
+                </div>
+              ` : ""}
+              ${ticket.parent_id ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Parent ID</span>
+                  <span class="jira-detail-value">CITI-${ticket.parent_id}</span>
+                </div>
+              ` : ""}
+              ${ticket.epic_link ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Epic Link</span>
+                  <span class="jira-detail-value">${ticket.epic_link}</span>
+                </div>
+              ` : ""}
+              ${ticket.url ? `
+                <div class="jira-detail-item">
+                  <span class="jira-detail-label">Source URL</span>
+                  <span class="jira-detail-value"><a href="${ticket.url}" target="_blank" style="color: var(--accent-blue); text-decoration: none;">View Source</a></span>
+                </div>
+              ` : ""}
+            </div>
+          </div>
+        `;
+      }
+
+      // Filter tickets
+      function filterTickets() {
+        const container = document.getElementById("jiraTickets");
+        let filtered = allTickets;
+        
+        if (currentFilter !== "all") {
+          filtered = allTickets.filter(t => (t.archive_status || "active").toLowerCase() === currentFilter);
+        }
+        
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="jira-empty">
+              <div class="jira-empty-icon">📋</div>
+              <div>No tickets found</div>
+            </div>
+          `;
+        } else {
+          container.innerHTML = filtered.map(renderTicket).join("");
+        }
+      }
+
+      // Load tickets
+      async function loadTickets() {
+        try {
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          if (!response.ok) throw new Error("Failed to load tickets");
+          
+          const data = await response.json();
+          // Backend returns {status: "success", tickets: [...], count: N}
+          allTickets = data.tickets || data.feedback || [];
+          
+          console.log(`Loaded ${allTickets.length} tickets from backend`);
+          
+          // Sort by timestamp (newest first) - backend already reverses, but ensure it's correct
+          allTickets.sort((a, b) => {
+            const dateA = new Date(a.timestamp || 0);
+            const dateB = new Date(b.timestamp || 0);
+            return dateB - dateA;
+          });
+          
+          // Update ticket count
+          const countElement = document.getElementById("ticketCount");
+          if (countElement) {
+            countElement.textContent = `${allTickets.length} ticket${allTickets.length !== 1 ? 's' : ''} total`;
+          }
+          
+          filterTickets();
+        } catch (error) {
+          console.error("Error loading tickets:", error);
+          document.getElementById("jiraTickets").innerHTML = `
+            <div class="jira-empty">
+              <div class="jira-empty-icon">⚠️</div>
+              <div>Failed to load tickets. Make sure the backend is running on ${API_BASE}</div>
+              <div style="margin-top: 8px; font-size: 12px; color: var(--text-secondary);">Error: ${error.message}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Open ticket detail modal
+      function openTicketDetail(ticketId) {
+        const ticket = allTickets.find(t => t.ticket_id == ticketId);
+        if (!ticket) return;
+
+        const analysis = generateDummyAnalysis(ticket);
+        const issueType = ticket.issue_type || "Task";
+        const status = ticket.archive_status || "active";
+        const screenshots = ticket.screenshot_paths || (ticket.screenshot_path ? [ticket.screenshot_path] : []);
+
+        const modalHTML = `
+          <div class="ticket-detail-modal active" id="ticketDetailModal" onclick="if(event.target.id === 'ticketDetailModal') closeTicketDetail()">
+            <div class="ticket-detail-content" onclick="event.stopPropagation()">
+              <div class="ticket-detail-header">
+                <div class="ticket-detail-title-section">
+                  <div class="ticket-detail-key">CITI-${ticket.ticket_id}</div>
+                  <h2>${ticket.summary || "No summary"}</h2>
+                  <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                    <span class="jira-label ${getIssueTypeClass(issueType)}">${issueType}</span>
+                    ${ticket.portfolio ? `<span class="jira-label jira-label-portfolio">${ticket.portfolio}</span>` : ""}
+                    <span class="jira-status ${getStatusClass(status)}">${status}</span>
+                  </div>
+                </div>
+                <button class="ticket-detail-close" onclick="closeTicketDetail()">×</button>
+              </div>
+              
+              <div class="ticket-detail-body">
+                <!-- High Level Overview -->
+                <div class="ticket-detail-section">
+                  <div class="ticket-detail-section-title">
+                    <span>📋</span>
+                    High Level Overview
+                  </div>
+                  <div class="ticket-detail-section-content">
+                    ${analysis.overview}
+                  </div>
+                </div>
+
+                <!-- Root Cause Analysis -->
+                <div class="ticket-detail-section">
+                  <div class="ticket-detail-section-title">
+                    <span>🔍</span>
+                    Root Cause Analysis
+                  </div>
+                  <div class="ticket-detail-section-content">
+                    ${analysis.rootCause}
+                  </div>
+                </div>
+
+                <!-- Potential Solution -->
+                <div class="ticket-detail-section">
+                  <div class="ticket-detail-section-title">
+                    <span>💡</span>
+                    Potential Solution
+                  </div>
+                  <div class="ticket-detail-section-content" style="white-space: pre-line;">
+                    ${analysis.solution}
+                  </div>
+                </div>
+
+                <!-- Ticket Details -->
+                <div class="ticket-detail-section">
+                  <div class="ticket-detail-section-title">
+                    <span>📝</span>
+                    Ticket Details
+                  </div>
+                  <div class="ticket-detail-grid">
+                    <div class="ticket-detail-card">
+                      <div class="ticket-detail-card-title">Created</div>
+                      <div class="ticket-detail-card-value">${formatDate(ticket.timestamp)}</div>
+                    </div>
+                    ${ticket.reporter ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Reporter</div>
+                        <div class="ticket-detail-card-value">${ticket.reporter}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.reporter_soeid ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Reporter SOEID</div>
+                        <div class="ticket-detail-card-value">${ticket.reporter_soeid}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.assignee_soeid ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Assignee SOEID</div>
+                        <div class="ticket-detail-card-value">${ticket.assignee_soeid}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.planned_start ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Planned Start</div>
+                        <div class="ticket-detail-card-value">${ticket.planned_start}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.planned_end ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Planned End</div>
+                        <div class="ticket-detail-card-value">${ticket.planned_end}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.parent_id ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Parent ID</div>
+                        <div class="ticket-detail-card-value">CITI-${ticket.parent_id}</div>
+                      </div>
+                    ` : ""}
+                    ${ticket.epic_link ? `
+                      <div class="ticket-detail-card">
+                        <div class="ticket-detail-card-title">Epic Link</div>
+                        <div class="ticket-detail-card-value">${ticket.epic_link}</div>
+                      </div>
+                    ` : ""}
+                  </div>
+                </div>
+
+                ${screenshots.length > 0 ? `
+                  <div class="ticket-detail-section">
+                    <div class="ticket-detail-section-title">
+                      <span>📸</span>
+                      Screenshots
+                    </div>
+                    <div class="jira-screenshots">
+                      ${screenshots.map(screenshot => {
+                        const filename = screenshot.includes('/') ? screenshot.split('/').pop() : screenshot;
+                        const screenshotUrl = `${API_BASE}/screenshots/${filename}`;
+                        return `<img src="${screenshotUrl}" alt="Screenshot" class="jira-screenshot" onclick="window.open('${screenshotUrl}', '_blank')" onerror="this.style.display='none';" />`;
+                      }).join("")}
+                    </div>
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+      }
+
+      // Close ticket detail modal
+      function closeTicketDetail() {
+        const modal = document.getElementById("ticketDetailModal");
+        if (modal) {
+          modal.remove();
+        }
+      }
+
+      // Filter buttons
+      document.querySelectorAll(".jira-filter-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".jira-filter-btn").forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          currentFilter = btn.dataset.filter;
+          filterTickets();
+        });
+      });
+
+      // Load tickets on page load
+      loadTickets();
+      
+      // Auto-refresh every 30 seconds
+      setInterval(loadTickets, 30000);
+    </script>
+  </body>
+</html>
+

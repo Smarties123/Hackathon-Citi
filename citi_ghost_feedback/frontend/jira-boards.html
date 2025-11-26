@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jira Boards - Citi Snap</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      body {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+
+      /* Jira Header - Match main page style */
+      .jira-header {
+        background: linear-gradient(120deg, #0d152b, #101a31 70%, #0a1224);
+        color: var(--text-primary);
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+      }
+
+      .jira-header-left {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+
+      .jira-logo {
+        font-size: 1.25rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .jira-logo .ghost-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: radial-gradient(circle at 30% 30%, #2daef7, #255be3 80%);
+        display: grid;
+        place-items: center;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      }
+
+      .jira-logo .ghost-icon svg {
+        width: 36px;
+        height: 36px;
+        fill: #f4f6fb;
+      }
+
+      .jira-logo .ghost-icon .ghost-eye {
+        fill: #101a31;
+      }
+
+      .jira-nav {
+        display: flex;
+        gap: 0.75rem;
+        margin-left: 2rem;
+      }
+
+      .jira-nav-item {
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        border: 1px solid transparent;
+      }
+
+      .jira-nav-item:hover {
+        background: var(--bg-secondary);
+        border-color: var(--border-color);
+      }
+
+      .jira-nav-item.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      .jira-header-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .jira-header-link {
+        color: var(--text-primary);
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+      }
+
+      .jira-header-link:hover {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      /* Board Container */
+      .board-container {
+        padding: 2rem;
+        max-width: 100%;
+        overflow-x: auto;
+      }
+
+      .board-header {
+        margin-bottom: 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .board-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .sprint-selector {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .sprint-btn {
+        padding: 0.5rem 1rem;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+        transition: all 0.2s;
+      }
+
+      .sprint-btn:hover {
+        background: var(--bg-primary);
+        border-color: var(--accent-blue);
+      }
+
+      .sprint-btn.active {
+        background: var(--accent-blue);
+        color: white;
+        border-color: var(--accent-blue);
+      }
+
+      /* Kanban Board */
+      .kanban-board {
+        display: flex;
+        gap: 1rem;
+        min-height: 600px;
+        padding-bottom: 2rem;
+      }
+
+      .kanban-column {
+        flex: 1;
+        min-width: 280px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .column-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+      }
+
+      .column-title {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--text-primary);
+        text-transform: uppercase;
+      }
+
+      .column-count {
+        background: var(--accent-blue);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+      }
+
+      .column-content {
+        flex: 1;
+        min-height: 100px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .column-content.drag-over {
+        background: rgba(45, 174, 247, 0.1);
+        border: 2px dashed var(--accent-cyan);
+        border-radius: 8px;
+      }
+
+      /* Ticket Card */
+      .board-ticket {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem;
+        cursor: grab;
+        transition: all 0.2s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .board-ticket:hover {
+        box-shadow: 0 4px 12px rgba(37, 91, 227, 0.3);
+        border-color: var(--accent-blue);
+        transform: translateY(-2px);
+      }
+
+      .board-ticket.dragging {
+        opacity: 0.5;
+        cursor: grabbing;
+      }
+
+      .ticket-key {
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      .ticket-summary {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+      }
+
+      .ticket-labels {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .ticket-label {
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+      }
+
+      .ticket-label-bug {
+        background: #e5493a;
+        color: white;
+      }
+
+      .ticket-label-story {
+        background: #4bce97;
+        color: white;
+      }
+
+      .ticket-label-task {
+        background: #0052cc;
+        color: white;
+      }
+
+      .ticket-label-incident {
+        background: #f5cd47;
+        color: #172b4d;
+      }
+
+      /* Backlog Column */
+      .backlog-column {
+        min-width: 320px;
+      }
+
+      .add-to-backlog {
+        padding: 0.75rem;
+        background: var(--bg-primary);
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        text-align: center;
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 0.5rem;
+      }
+
+      .add-to-backlog:hover {
+        border-color: var(--accent-blue);
+        color: var(--accent-blue);
+        background: rgba(37, 91, 227, 0.1);
+      }
+
+      /* Empty State */
+      .empty-column {
+        text-align: center;
+        padding: 1.5rem;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+      }
+
+      /* Loading */
+      .loading {
+        text-align: center;
+        padding: 3rem;
+        color: var(--text-secondary);
+      }
+
+      /* Ticket Detail Modal */
+      .ticket-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        overflow-y: auto;
+        padding: 2rem;
+      }
+
+      .ticket-modal.active {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
+      .ticket-modal-content {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        max-width: 800px;
+        width: 100%;
+        margin: 2rem auto;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      }
+
+      .ticket-modal-header {
+        padding: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .ticket-modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+      }
+
+      .ticket-modal-key {
+        font-size: 0.875rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.75rem;
+      }
+
+      .ticket-modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .ticket-modal-close:hover {
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+
+      .ticket-modal-body {
+        padding: 2rem;
+      }
+
+      .ticket-modal-section {
+        margin-bottom: 2rem;
+      }
+
+      .ticket-modal-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid var(--border-color);
+      }
+
+      .ticket-modal-field {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.875rem;
+      }
+
+      .ticket-modal-field-label {
+        color: var(--text-secondary);
+        font-weight: 600;
+      }
+
+      .ticket-modal-field-value {
+        color: var(--text-primary);
+      }
+
+      .ticket-modal-description {
+        background: var(--bg-primary);
+        border: 1px solid var(--border-color);
+        padding: 1rem;
+        border-radius: 6px;
+        white-space: pre-wrap;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        color: var(--text-primary);
+      }
+
+      .ticket-modal-screenshots {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .ticket-modal-screenshot {
+        max-width: 300px;
+        max-height: 200px;
+        border-radius: 6px;
+        border: 1px solid var(--border-color);
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .ticket-modal-screenshot:hover {
+        transform: scale(1.05);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Jira Header -->
+    <div class="jira-header">
+      <div class="jira-header-left">
+        <div class="jira-logo">
+          <div class="ghost-icon">
+            <svg viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M32 4c13.2 0 22 9.88 22 23.06V60L46 52l-6 8-8-8-8 8-6-8-8 8V27.06C10 13.88 18.8 4 32 4Z" fill="#f4f6fb"></path>
+              <circle cx="24" cy="28" r="4" fill="#101a31"></circle>
+              <circle cx="40" cy="28" r="4" fill="#101a31"></circle>
+            </svg>
+          </div>
+          <div>
+            <div style="font-size: 1.25rem; font-weight: 600;">Citi Snap</div>
+            <div style="color: var(--text-secondary); font-size: 0.9rem;">Jira Integration</div>
+          </div>
+        </div>
+        <div class="jira-nav">
+          <div class="jira-nav-item" onclick="window.location.href='jira.html'">Issues</div>
+          <div class="jira-nav-item active" onclick="window.location.href='jira-boards.html'">Boards</div>
+        </div>
+      </div>
+      <div class="jira-header-right">
+        <a href="index.html" class="jira-header-link">← Back to Citi Snap</a>
+      </div>
+    </div>
+
+    <!-- Board Container -->
+    <div class="board-container">
+      <div class="board-header">
+        <h1 class="board-title">Citi Snap Board</h1>
+        <div class="sprint-selector">
+          <button class="sprint-btn active">Current Sprint</button>
+          <button class="sprint-btn">Backlog</button>
+        </div>
+      </div>
+
+      <!-- Kanban Board -->
+      <div class="kanban-board" id="kanbanBoard">
+        <div class="loading">Loading board...</div>
+      </div>
+    </div>
+
+    <script>
+      const API_BASE = "http://127.0.0.1:5000";
+      let allTickets = [];
+      let draggedTicket = null;
+      let draggedFromColumn = null;
+      let wasDragged = false;
+
+      // Column definitions
+      const columns = [
+        { id: "backlog", title: "Backlog", status: "backlog" },
+        { id: "todo", title: "To Do", status: "todo" },
+        { id: "inprogress", title: "In Progress", status: "inprogress" },
+        { id: "ready", title: "Ready for Validation", status: "ready" },
+        { id: "blocked", title: "Blocked", status: "blocked" },
+        { id: "completed", title: "Completed", status: "completed" }
+      ];
+
+      // Get issue type label class
+      function getIssueTypeClass(issueType) {
+        const type = (issueType || "Task").toLowerCase();
+        if (type === "bug") return "ticket-label-bug";
+        if (type === "story") return "ticket-label-story";
+        if (type === "incident") return "ticket-label-incident";
+        return "ticket-label-task";
+      }
+
+      // Render ticket card
+      function renderTicketCard(ticket) {
+        const issueType = ticket.issue_type || "Task";
+        return `
+          <div class="board-ticket" draggable="true" data-ticket-id="${ticket.ticket_id}">
+            <div class="ticket-key">CITI-${ticket.ticket_id}</div>
+            <div class="ticket-summary">${ticket.summary || "No summary"}</div>
+            <div class="ticket-labels">
+              <span class="ticket-label ${getIssueTypeClass(issueType)}">${issueType}</span>
+            </div>
+          </div>
+        `;
+      }
+
+      // Render board
+      function renderBoard() {
+        const board = document.getElementById("kanbanBoard");
+        
+        // Group tickets by status
+        const ticketsByStatus = {};
+        columns.forEach(col => {
+          ticketsByStatus[col.status] = allTickets.filter(t => 
+            (t.board_status || "backlog") === col.status
+          );
+        });
+
+        board.innerHTML = columns.map(column => {
+          const tickets = ticketsByStatus[column.status] || [];
+          return `
+            <div class="kanban-column ${column.id === 'backlog' ? 'backlog-column' : ''}" 
+                 data-column="${column.status}"
+                 ondrop="handleDrop(event)" 
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)">
+              <div class="column-header">
+                <div class="column-title">${column.title}</div>
+                <div class="column-count">${tickets.length}</div>
+              </div>
+              <div class="column-content" id="column-${column.status}">
+                ${tickets.length > 0 
+                  ? tickets.map(renderTicketCard).join("")
+                  : `<div class="empty-column">No tickets</div>`
+                }
+                ${column.id === 'backlog' ? `
+                  <div class="add-to-backlog" onclick="showAddToBacklog()">
+                    + Add to Backlog
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // Add drag event listeners and click handlers
+        document.querySelectorAll(".board-ticket").forEach(ticket => {
+          ticket.addEventListener("dragstart", handleDragStart);
+          ticket.addEventListener("dragend", handleDragEnd);
+          
+          // Handle click to open modal (but not if it was dragged)
+          ticket.addEventListener("click", (e) => {
+            // Only open modal if it wasn't a drag operation
+            setTimeout(() => {
+              if (!wasDragged) {
+                const ticketId = ticket.dataset.ticketId;
+                openTicketModal(parseInt(ticketId));
+              }
+            }, 200);
+          });
+        });
+      }
+
+      // Drag and Drop Handlers
+      function handleDragStart(e) {
+        wasDragged = false;
+        draggedTicket = e.target;
+        draggedFromColumn = e.target.closest(".kanban-column").dataset.column;
+        e.target.classList.add("dragging");
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("text/html", e.target.outerHTML);
+      }
+
+      function handleDragEnd(e) {
+        e.target.classList.remove("dragging");
+        document.querySelectorAll(".column-content").forEach(col => {
+          col.classList.remove("drag-over");
+        });
+        
+        // Reset drag flag after a short delay
+        setTimeout(() => {
+          wasDragged = false;
+        }, 100);
+      }
+
+      function handleDragOver(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = "move";
+        const columnContent = e.currentTarget.querySelector(".column-content");
+        if (columnContent) {
+          columnContent.classList.add("drag-over");
+        }
+        return false;
+      }
+
+      function handleDragLeave(e) {
+        const columnContent = e.currentTarget.querySelector(".column-content");
+        if (columnContent) {
+          columnContent.classList.remove("drag-over");
+        }
+      }
+
+      function handleDrop(e) {
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+
+        wasDragged = true; // Mark that a drag operation occurred
+
+        const columnContent = e.currentTarget.querySelector(".column-content");
+        if (columnContent) {
+          columnContent.classList.remove("drag-over");
+        }
+
+        if (draggedTicket) {
+          const ticketId = draggedTicket.dataset.ticketId;
+          const newStatus = e.currentTarget.dataset.column;
+          
+          // Update ticket status
+          updateTicketStatus(ticketId, newStatus, draggedFromColumn);
+          
+          // Move ticket visually
+          const ticket = allTickets.find(t => t.ticket_id == ticketId);
+          if (ticket) {
+            ticket.board_status = newStatus;
+            renderBoard();
+          }
+        }
+
+        return false;
+      }
+
+      // Update ticket status (would call backend API in real implementation)
+      async function updateTicketStatus(ticketId, newStatus, oldStatus) {
+        // In a real implementation, you'd call the backend API here
+        // For now, we'll just update locally
+        console.log(`Moving ticket ${ticketId} from ${oldStatus} to ${newStatus}`);
+        
+        // You could add a backend endpoint like:
+        // await fetch(`${API_BASE}/update-ticket-status`, {
+        //   method: "PUT",
+        //   headers: { "Content-Type": "application/json" },
+        //   body: JSON.stringify({ ticket_id: ticketId, board_status: newStatus })
+        // });
+      }
+
+      // Format date
+      function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      // Open ticket modal
+      function openTicketModal(ticketId) {
+        const ticket = allTickets.find(t => t.ticket_id == ticketId);
+        if (!ticket) return;
+
+        const screenshots = ticket.screenshot_paths || (ticket.screenshot_path ? [ticket.screenshot_path] : []);
+        const issueType = ticket.issue_type || "Task";
+        
+        const modalHTML = `
+          <div class="ticket-modal active" id="ticketModal" onclick="if(event.target.id === 'ticketModal') closeTicketModal()">
+            <div class="ticket-modal-content" onclick="event.stopPropagation()">
+              <div class="ticket-modal-header">
+                <div>
+                  <div class="ticket-modal-key">CITI-${ticket.ticket_id}</div>
+                  <div class="ticket-modal-title">${ticket.summary || "No summary"}</div>
+                </div>
+                <button class="ticket-modal-close" onclick="closeTicketModal()">×</button>
+              </div>
+              <div class="ticket-modal-body">
+                <div class="ticket-modal-section">
+                  <div class="ticket-modal-section-title">Details</div>
+                  <div class="ticket-modal-field">
+                    <div class="ticket-modal-field-label">Issue Type:</div>
+                    <div class="ticket-modal-field-value">
+                      <span class="ticket-label ${getIssueTypeClass(issueType)}">${issueType}</span>
+                    </div>
+                  </div>
+                  <div class="ticket-modal-field">
+                    <div class="ticket-modal-field-label">Status:</div>
+                    <div class="ticket-modal-field-value">${ticket.board_status || "backlog"}</div>
+                  </div>
+                  <div class="ticket-modal-field">
+                    <div class="ticket-modal-field-label">Created:</div>
+                    <div class="ticket-modal-field-value">${formatDate(ticket.timestamp)}</div>
+                  </div>
+                  ${ticket.portfolio ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Portfolio:</div>
+                      <div class="ticket-modal-field-value">${ticket.portfolio}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.reporter ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Reporter:</div>
+                      <div class="ticket-modal-field-value">${ticket.reporter}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.reporter_soeid ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Reporter SOEID:</div>
+                      <div class="ticket-modal-field-value">${ticket.reporter_soeid}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.assignee_soeid ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Assignee SOEID:</div>
+                      <div class="ticket-modal-field-value">${ticket.assignee_soeid}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.planned_start ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Planned Start:</div>
+                      <div class="ticket-modal-field-value">${ticket.planned_start}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.planned_end ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Planned End:</div>
+                      <div class="ticket-modal-field-value">${ticket.planned_end}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.parent_id ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Parent ID:</div>
+                      <div class="ticket-modal-field-value">CITI-${ticket.parent_id}</div>
+                    </div>
+                  ` : ""}
+                  ${ticket.epic_link ? `
+                    <div class="ticket-modal-field">
+                      <div class="ticket-modal-field-label">Epic Link:</div>
+                      <div class="ticket-modal-field-value">${ticket.epic_link}</div>
+                    </div>
+                  ` : ""}
+                </div>
+
+                ${ticket.description ? `
+                  <div class="ticket-modal-section">
+                    <div class="ticket-modal-section-title">Description</div>
+                    <div class="ticket-modal-description">${ticket.description}</div>
+                  </div>
+                ` : ""}
+
+                ${screenshots.length > 0 ? `
+                  <div class="ticket-modal-section">
+                    <div class="ticket-modal-section-title">Screenshots</div>
+                    <div class="ticket-modal-screenshots">
+                      ${screenshots.map(screenshot => {
+                        const filename = screenshot.includes('/') ? screenshot.split('/').pop() : screenshot;
+                        const screenshotUrl = `${API_BASE}/screenshots/${filename}`;
+                        return `<img src="${screenshotUrl}" alt="Screenshot" class="ticket-modal-screenshot" onclick="window.open('${screenshotUrl}', '_blank')" onerror="this.style.display='none';" />`;
+                      }).join("")}
+                    </div>
+                  </div>
+                ` : ""}
+              </div>
+            </div>
+          </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+      }
+
+      // Close ticket modal
+      function closeTicketModal() {
+        const modal = document.getElementById("ticketModal");
+        if (modal) {
+          modal.remove();
+        }
+      }
+
+      // Show add to backlog dialog
+      function showAddToBacklog() {
+        const ticketId = prompt("Enter ticket ID to add to backlog (e.g., 1, 2, 3):");
+        if (ticketId) {
+          const ticket = allTickets.find(t => t.ticket_id == ticketId);
+          if (ticket) {
+            ticket.board_status = "backlog";
+            renderBoard();
+          } else {
+            alert(`Ticket CITI-${ticketId} not found`);
+          }
+        }
+      }
+
+      // Load tickets
+      async function loadTickets() {
+        try {
+          const response = await fetch(`${API_BASE}/get-feedback`);
+          if (!response.ok) throw new Error("Failed to load tickets");
+          
+          const data = await response.json();
+          allTickets = data.tickets || data.feedback || [];
+          
+          // Initialize board_status if not present (default to backlog)
+          allTickets.forEach(ticket => {
+            if (!ticket.board_status) {
+              ticket.board_status = "backlog";
+            }
+          });
+          
+          renderBoard();
+        } catch (error) {
+          console.error("Error loading tickets:", error);
+          document.getElementById("kanbanBoard").innerHTML = `
+            <div class="loading">
+              <div>⚠️</div>
+              <div>Failed to load board. Make sure the backend is running on ${API_BASE}</div>
+            </div>
+          `;
+        }
+      }
+
+      // Load tickets on page load
+      loadTickets();
+      
+      // Auto-refresh every 30 seconds
+      setInterval(loadTickets, 30000);
+    </script>
+  </body>
+</html>
+
