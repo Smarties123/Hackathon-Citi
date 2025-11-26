@@ -1,13 +1,11 @@
 Unique ID,Summary,Issue Type,Description,Portfolio,Reporter SOEID,Assignee SOEID,Reporter,Planned Start,Planned End,Parent ID,Epic Link,Evidence Path,Timestamp,Archive Status,Board Status
-1,Automated test submission,Bug,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_150013_eb2ccfd9.png,2025-11-24 15:00:13,active,backlog
-2,Automated test submission,,This is a test created by an automated script.,TestPortfolio,tester01,dev01,Automated Tester,2025-11-24,2025-11-30,,,evidence/20251124_160658_1ccbc7ee.png,2025-11-24 16:06:58,active,backlog
-3,sdsds,Story,dads,sss,dads,dads,dsds,2025-11-15,2025-11-19,dsds,dsdsdsds,,2025-11-24 21:40:38,active,backlog
-4,dads,Task,ssd,dads,dads,sds,dads,,,did,dsdsds,,2025-11-24 21:44:22,active,backlog
-5,fhjaf,Task,fafda,fdsfd,feds,fdsf,fdsf,,,fdsf,fds,"evidence/20251126_103325_bcfea10e.png,evidence/20251126_103325_6c9f3481.png,evidence/20251126_103325_fb7b4fc9.png",2025-11-26 10:33:25,active,backlog
-6,HKJHKJH,Task,HKJHKJH,,,,,,,,,"evidence/20251126_103635_98ae10c5.png,evidence/20251126_103635_9025c077.png,evidence/20251126_103635_59a5c41c.png",2025-11-26 10:36:35,active,backlog
-7,days,Task,days,,,,,,,,,"evidence/20251126_104018_883ae5d9.png,evidence/20251126_104018_85a2efa7.png,evidence/20251126_104018_b06d878d.png,evidence/20251126_104018_be263acc.png",2025-11-26 10:40:18,active,backlog
-8,ddssd,Task,dsdsds,,,,,,,,,,2025-11-26 11:02:20,active,blocked
-9,ufhfjfherjf,Task,ferufgrejf,nerf,free,rferg,frefer,,,rfe,ferkfher,,2025-11-26 11:03:29,active,backlog
-10,cfrcfrcfc,Task,cfrcrfccf,,,,,,,,,,2025-11-26 11:06:40,active,inprogress
-11,sasas,Task,saas,,saas,,sas,,,,,,2025-11-26 11:18:45,resolved,backlog
-12,dad,Task,dad,,dad,,dad,,,,,,2025-11-26 11:37:43,archived,todo
+1,Login page error,Bug,User unable to login with valid credentials,Digital Banking,jsmith,ajones,John Smith,2025-11-20,2025-11-21,1001,EPIC-123,evidence/20251120_090000_abc123.png,2025-11-20 09:00:00,active,backlog
+2,Add dark mode,Story,Request to add dark mode to dashboard,Digital Banking,jsmith,ajones,John Smith,2025-11-22,2025-11-30,1002,EPIC-124,evidence/20251122_101500_def456.png,2025-11-22 10:15:00,active,ready
+3,Export to CSV fails,Bug,Export button does not generate CSV file,Analytics,mbrown,jsmith,Mary Brown,2025-11-23,2025-11-24,1003,EPIC-125,evidence/20251123_110200_ghi789.png,2025-11-23 11:02:00,active,inprogress
+4,Performance issue,Task,Dashboard loads slowly during peak hours,Analytics,mbrown,ajones,Mary Brown,2025-11-24,2025-11-25,1004,EPIC-126,evidence/20251124_120300_jkl012.png,2025-11-24 12:03:00,active,blocked
+5,Update user profile,Story,Allow users to update their email and phone,Digital Banking,jsmith,ajones,John Smith,2025-11-25,2025-11-28,1005,EPIC-127,evidence/20251125_130400_mno345.png,2025-11-25 13:04:00,active,ready
+6,Archive old tickets,Task,Archive tickets older than 6 months,Support,ajones,mbrown,Alice Jones,2025-11-26,2025-11-27,1006,EPIC-128,evidence/20251126_140500_pqr678.png,2025-11-26 14:05:00,archived,done
+7,Add multi-factor auth,Story,Implement multi-factor authentication for login,Security,jsmith,ajones,John Smith,2025-11-27,2025-12-01,1007,EPIC-129,evidence/20251127_150600_stu901.png,2025-11-27 15:06:00,active,backlog
+8,Notification bug,Bug,Notifications not showing for new tickets,Support,ajones,mbrown,Alice Jones,2025-11-28,2025-11-29,1008,EPIC-130,evidence/20251128_160700_vwx234.png,2025-11-28 16:07:00,resolved,done
+9,UI improvement,Task,Improve spacing and font size on dashboard,Digital Banking,jsmith,ajones,John Smith,2025-11-29,2025-12-02,1009,EPIC-131,evidence/20251129_170800_yza567.png,2025-11-29 17:08:00,active,ready
+10,Data sync issue,Bug,Data not syncing between mobile and web,Mobile,mbrown,ajones,Mary Brown,2025-11-30,2025-12-03,1010,EPIC-132,evidence/20251130_180900_bcd890.png,2025-11-30 18:09:00,active,inprogress
