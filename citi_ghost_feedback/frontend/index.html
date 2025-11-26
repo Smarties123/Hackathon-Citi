@@ -24,6 +24,12 @@
         </div>
       </div>
       <div class="nav-actions">
+        <a href="jira.html" class="ghost-btn ghost-btn-outline" style="text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          View Jira Tickets
+        </a>
         <button class="ghost-btn ghost-btn-outline">Docs</button>
         <button class="shortcut-btn header-search-btn" data-action="search" title="Search Feedback">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -856,7 +862,7 @@
     </main>
 
     <script src="html2canvas.min.js"></script>
-    <script src="widget.js?v=2.0"></script>
+    <script src="widget.js?v=3.5"></script>
     <script>
       const tabs = document.querySelectorAll(".tab");
       const views = document.querySelectorAll(".sample-view");
@@ -882,7 +888,10 @@
         const launchBtn = document.querySelector(".nav-actions .ghost-btn:last-child");
         if (launchBtn && !launchBtn.dataset.ghostAttached) {
           launchBtn.dataset.ghostAttached = "true";
-          launchBtn.addEventListener("click", () => api.openFeedback());
+          launchBtn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Prevent event from bubbling to document click handler
+            api.openMenu();
+          });
         }
       };
 
@@ -1351,7 +1360,9 @@ Application encounters an error when [describe the specific action or scenario].
 - Frequency: [Always / Sometimes / Rarely]
 - First Occurred: [Date/Time]
 - Workaround: [If any exists]`,
-          role: "Client"
+          role: "Client",
+          plannedStart: "",
+          plannedEnd: ""
         },
         "Feature Request": {
           issueType: "Story",
@@ -1379,7 +1390,9 @@ Request to add [describe the new feature or enhancement].
 - Related Features: [Any existing features this relates to]
 - Examples: [Any similar features in other applications]
 - Mockups/Wireframes: [If available]`,
-          role: "Client"
+          role: "Product Management",
+          plannedStart: "",
+          plannedEnd: ""
         },
         "Performance Issue": {
           issueType: "Bug",
@@ -1421,7 +1434,9 @@ Application experiences slow performance or latency when [describe the specific 
 - Number of Records: [If applicable, e.g., loading 10,000 rows]
 - Concurrent Users: [If known]
 - Server Load: [If available]`,
-          role: "Client"
+          role: "Engineering",
+          plannedStart: "",
+          plannedEnd: ""
         }
       };
 
@@ -1432,9 +1447,10 @@ Application experiences slow performance or latency when [describe the specific 
           const template = templates[templateName];
           
           if (template && window.citiGhostWidget) {
-            window.citiGhostWidget.openFeedback(template);
+            // Open menu with template data - fills initial panel first
+            window.citiGhostWidget.openMenu(template);
           } else if (window.citiGhostWidget) {
-            window.citiGhostWidget.openFeedback();
+            window.citiGhostWidget.openMenu();
           }
         });
       });
@@ -1925,9 +1941,10 @@ Application experiences slow performance or latency when [describe the specific 
       }, 30000);
 
       // Launch Widget button - opens the Citi Snap widget
-      document.getElementById("launchWidgetBtn")?.addEventListener("click", () => {
+      document.getElementById("launchWidgetBtn")?.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent event from bubbling to document click handler
         if (window.citiGhostWidget) {
-          window.citiGhostWidget.openFeedback();
+          window.citiGhostWidget.openMenu();
         } else {
           alert("Citi Snap widget is loading. Please wait a moment and try again.");
         }

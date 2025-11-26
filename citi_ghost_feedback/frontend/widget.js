@@ -20,20 +20,14 @@
   const state = {
     screenshotData: [], // Array to support multiple screenshots
     role: "Client",
+    templateData: null, // Store template data to apply when modal opens
   };
 
   const createGhostSVG = (size = 28) => `
     <svg viewBox="0 0 64 64" width="${size}" height="${size}" aria-hidden="true">
-      <defs>
-        <linearGradient id="ghostGradient" x1="0%" x2="0%" y1="0%" y2="100%">
-          <stop offset="0%" stop-color="#2DAEF7"/>
-          <stop offset="100%" stop-color="#255BE3"/>
-        </linearGradient>
-      </defs>
-      <path d="M32 6c12.7 0 21 9.2 21 22.3V58l-5.4-6.5-4.7 6.9-5.9-6.9-5.9 6.9-4.7-6.9L21 58V28.3C21 15.2 19.3 6 32 6Z" fill="url(#ghostGradient)" stroke="#2DAEF7" stroke-width="2" stroke-linejoin="round"/>
-      <circle cx="25" cy="30" r="4" fill="#0A1224"/>
-      <circle cx="39" cy="30" r="4" fill="#0A1224"/>
-      <path d="M26 41c1.8 2 4 3 6.8 3 2.9 0 5-1 6.8-3" stroke="#F6F8FC" stroke-width="2.6" stroke-linecap="round" fill="none"/>
+      <path d="M32 4c13.2 0 22 9.88 22 23.06V60L46 52l-6 8-8-8-8 8-6-8-8 8V27.06C10 13.88 18.8 4 32 4Z" fill="#f4f6fb"></path>
+      <circle cx="24" cy="28" r="4" fill="#101a31"></circle>
+      <circle cx="40" cy="28" r="4" fill="#101a31"></circle>
     </svg>
   `;
 
@@ -460,7 +454,6 @@
     toolbar.className = "citi-ghost-toolbar";
     toolbar.innerHTML = `
       <div class="ghost-icon-mini">${createGhostSVG(32)}</div>
-      <span class="ghost-toolbar-label">Citi Snap</span>
     `;
     return toolbar;
   };
@@ -477,7 +470,7 @@
         <option value="Engineering">Engineering</option>
       </select>
       
-      <div class="ghost-menu-quick-fields">
+      <div class="ghost-menu-quick-fields" style="margin-top: 1.25rem;">
         <div class="ghost-menu-field" style="grid-column: 1 / -1;">
           <label for="menuIssueType">Issue Type *</label>
           <select id="menuIssueType" class="ghost-menu-select">
@@ -487,46 +480,25 @@
             <option value="Incident">Incident</option>
           </select>
         </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuPortfolio">Portfolio</label>
-          <input type="text" id="menuPortfolio" class="ghost-menu-input" placeholder="Portfolio name" />
+        <div class="ghost-menu-field" style="grid-column: 1 / -1;">
+          <label for="menuSummary">Summary *</label>
+          <input type="text" id="menuSummary" class="ghost-menu-input" placeholder="Brief summary of the issue or request" />
         </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuReporterSOEID">Reporter SOEID</label>
-          <input type="text" id="menuReporterSOEID" class="ghost-menu-input" placeholder="Reporter SOEID" />
+      </div>
+      
+      <div class="screenshot-section" style="margin-top: 1.25rem;">
+        <div style="display: flex; gap: 0.5rem;">
+          <button type="button" class="ghost-btn capture-btn" style="flex: 1;">📸 Capture Current Page</button>
+          <button type="button" class="ghost-btn detect-clipboard-btn" style="flex: 1;">📋 Detect from Clipboard</button>
         </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuAssigneeSOEID">Assignee SOEID</label>
-          <input type="text" id="menuAssigneeSOEID" class="ghost-menu-input" placeholder="Assignee SOEID" />
+        <div class="screenshot-instructions" style="margin-top: 0.75rem; font-size: 0.85rem; color: #9BA7B8;">
+          <p><strong>Tip:</strong> Take a screenshot with your system tool (Win+Shift+S / Cmd+Shift+4), then click "Detect from Clipboard" or just paste (Ctrl+V / Cmd+V) anywhere. You can add multiple screenshots.</p>
         </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuReporter">Reporter</label>
-          <input type="text" id="menuReporter" class="ghost-menu-input" placeholder="Reporter name" />
+        <div class="screenshots-preview-grid" id="screenshotsPreview" style="display: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
+          <!-- Screenshot previews will be added here dynamically -->
         </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuPlannedStart">Planned Start</label>
-          <input type="date" id="menuPlannedStart" class="ghost-menu-input" />
-        </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuPlannedEnd">Planned End</label>
-          <input type="date" id="menuPlannedEnd" class="ghost-menu-input" />
-        </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuParentID">Parent ID</label>
-          <input type="text" id="menuParentID" class="ghost-menu-input" placeholder="Parent ticket ID" />
-        </div>
-        
-        <div class="ghost-menu-field">
-          <label for="menuEpicLink">Epic Link</label>
-          <input type="text" id="menuEpicLink" class="ghost-menu-input" placeholder="Epic link" />
-        </div>
+        <input type="file" id="screenshotUpload" accept="image/*" multiple style="display: none;">
+        <span class="ghost-status capture-status"></span>
       </div>
       
       <div class="ghost-menu-actions">
@@ -551,30 +523,20 @@
                 </div>
         <div class="ghost-modal-body">
           <div class="form-field">
-            <label for="ghostSummary">Summary *</label>
-            <input type="text" id="ghostSummary" class="ghost-input" placeholder="Brief summary of the issue or request" required />
-          </div>
-
-          <div class="form-field">
             <label for="ghostDescription">Description *</label>
             <textarea id="ghostDescription" class="ghost-textarea" placeholder="Detailed description of the issue or request" required></textarea>
           </div>
 
-          <div class="ghost-modal-actions">
-            <div class="screenshot-section">
-              <div style="display: flex; gap: 0.5rem;">
-                <button type="button" class="ghost-btn capture-btn" style="flex: 1;">📸 Capture Current Page</button>
-                <button type="button" class="ghost-btn detect-clipboard-btn" style="flex: 1;">📋 Detect from Clipboard</button>
-              </div>
-              <div class="screenshot-instructions">
-                <p><strong>Tip:</strong> Take a screenshot with your system tool (Win+Shift+S / Cmd+Shift+4), then click "Detect from Clipboard" or just paste (Ctrl+V / Cmd+V) anywhere in this form. You can add multiple screenshots.</p>
-              </div>
-              <div class="screenshots-preview-grid" id="screenshotsPreview" style="display: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.75rem; margin-top: 1rem;">
-                <!-- Screenshot previews will be added here dynamically -->
-              </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-field">
+              <label for="modalPlannedStart">Planned Start</label>
+              <input type="date" id="modalPlannedStart" class="ghost-input" />
             </div>
-            <input type="file" id="screenshotUpload" accept="image/*" multiple style="display: none;">
-            <span class="ghost-status capture-status"></span>
+            
+            <div class="form-field">
+              <label for="modalPlannedEnd">Planned End</label>
+              <input type="date" id="modalPlannedEnd" class="ghost-input" />
+            </div>
           </div>
         </div>
         <div class="ghost-modal-footer">
@@ -604,27 +566,23 @@
   document.body.appendChild(modal);
 
   const roleSelect = menu.querySelector(".ghost-menu-role");
-  const captureBtn = modal.querySelector(".capture-btn");
-  const detectClipboardBtn = modal.querySelector(".detect-clipboard-btn");
-  const captureStatus = modal.querySelector(".capture-status");
-  const screenshotUpload = modal.querySelector("#screenshotUpload");
-  const screenshotsPreview = modal.querySelector("#screenshotsPreview");
+  const captureBtn = menu.querySelector(".capture-btn");
+  const detectClipboardBtn = menu.querySelector(".detect-clipboard-btn");
+  const captureStatus = menu.querySelector(".capture-status");
+  const screenshotUpload = menu.querySelector("#screenshotUpload");
+  const screenshotsPreview = menu.querySelector("#screenshotsPreview");
   let captureCountdown = null;
   const submitBtn = modal.querySelector(".ghost-submit");
   const submitStatus = modal.querySelector(".submit-status");
-  const summaryInput = modal.querySelector("#ghostSummary");
   const descriptionInput = modal.querySelector("#ghostDescription");
   
-  // Menu fields (these are in the initial panel)
+  // Menu fields (Issue Type and Summary stay in the initial panel)
   const menuIssueType = menu.querySelector("#menuIssueType");
-  const menuPortfolio = menu.querySelector("#menuPortfolio");
-  const menuReporterSOEID = menu.querySelector("#menuReporterSOEID");
-  const menuAssigneeSOEID = menu.querySelector("#menuAssigneeSOEID");
-  const menuReporter = menu.querySelector("#menuReporter");
-  const menuPlannedStart = menu.querySelector("#menuPlannedStart");
-  const menuPlannedEnd = menu.querySelector("#menuPlannedEnd");
-  const menuParentID = menu.querySelector("#menuParentID");
-  const menuEpicLink = menu.querySelector("#menuEpicLink");
+  const menuSummary = menu.querySelector("#menuSummary");
+  
+  // Modal fields (moved from menu to modal)
+  const modalPlannedStart = modal.querySelector("#modalPlannedStart");
+  const modalPlannedEnd = modal.querySelector("#modalPlannedEnd");
   const cancelBtn = modal.querySelector(".ghost-cancel");
   const closeBtn = modal.querySelector(".ghost-modal-close");
 
@@ -632,6 +590,18 @@
     if (open) {
       menu.classList.remove("hidden");
       positionMenu();
+      // Focus menu to enable paste events
+      menu.focus();
+      menu.setAttribute("tabindex", "-1");
+      // Update screenshot status when menu opens
+      updateScreenshotsPreview();
+      if (state.screenshotData.length > 0) {
+        captureStatus.textContent = `${state.screenshotData.length} screenshot(s) ready.`;
+        captureStatus.className = "ghost-status capture-status success";
+      } else {
+        captureStatus.textContent = "";
+        captureStatus.className = "ghost-status capture-status";
+      }
     } else {
       menu.classList.add("hidden");
     }
@@ -760,6 +730,23 @@
     }
   };
 
+  const applyTemplateToMenu = (templateData) => {
+    // Apply template data to initial panel (menu) fields
+    if (templateData) {
+      if (menuSummary && templateData.summary) {
+        menuSummary.value = templateData.summary;
+      }
+      if (menuIssueType && templateData.issueType) {
+        menuIssueType.value = templateData.issueType;
+      }
+      if (templateData.role) {
+        state.role = templateData.role;
+        roleSelect.value = templateData.role;
+        updateRoleText(menu, modal);
+      }
+    }
+  };
+
   const openFeedbackModal = (templateData = null) => {
     modal.classList.remove("hidden");
     // Ensure modal covers full screen
@@ -770,8 +757,6 @@
     modal.focus();
     modal.setAttribute("tabindex", "-1");
     submitStatus.textContent = "";
-    
-    // Values from menu quick fields will be used directly in submit (no need to copy to modal)
     
     // Reset clipboard check flag
     clipboardCheckAttempted = false;
@@ -788,35 +773,36 @@
       captureStatus.textContent = `${state.screenshotData.length} screenshot(s) ready.`;
       captureStatus.className = "ghost-status capture-status success";
     } else {
-      captureStatus.textContent = "Click anywhere to detect screenshot from clipboard";
+      captureStatus.textContent = "";
       captureStatus.className = "ghost-status capture-status";
     }
     
-    // Apply template if provided
-    if (templateData) {
-      const summaryField = modal.querySelector("#ghostSummary");
+    // Use stored template data or provided template data
+    const templateToApply = templateData || state.templateData;
+    
+    // Apply template to modal fields
+    if (templateToApply) {
       const descriptionField = modal.querySelector("#ghostDescription");
       
-      if (summaryField && templateData.summary) {
-        summaryField.value = templateData.summary;
+      // Update modal fields
+      if (descriptionField && templateToApply.description) {
+        descriptionField.value = templateToApply.description;
       }
-      if (descriptionField && templateData.description) {
-        descriptionField.value = templateData.description;
+      
+      // Update other modal fields if provided in template
+      if (modalPlannedStart && templateToApply.plannedStart) {
+        modalPlannedStart.value = templateToApply.plannedStart;
       }
-      if (menuIssueType && templateData.issueType) {
-        menuIssueType.value = templateData.issueType;
-      }
-      if (templateData.role) {
-        state.role = templateData.role;
-        roleSelect.value = templateData.role;
-        updateRoleText(menu, modal);
+      if (modalPlannedEnd && templateToApply.plannedEnd) {
+        modalPlannedEnd.value = templateToApply.plannedEnd;
       }
     } else {
-      // Clear modal fields if no template (menu fields stay for next submission)
-      const summaryField = modal.querySelector("#ghostSummary");
+      // Clear modal fields if no template
       const descriptionField = modal.querySelector("#ghostDescription");
-      if (summaryField) summaryField.value = "";
       if (descriptionField) descriptionField.value = "";
+      // Clear all other modal fields
+      if (modalPlannedStart) modalPlannedStart.value = "";
+      if (modalPlannedEnd) modalPlannedEnd.value = "";
     }
   };
 
@@ -824,6 +810,8 @@
     modal.classList.add("hidden");
     modal.style.visibility = "";
     modal.style.opacity = "";
+    // Clear template data when modal closes
+    state.templateData = null;
   };
 
   menu.addEventListener("click", (event) => {
@@ -892,7 +880,6 @@
   cancelBtn.addEventListener("click", () => {
     closeModal();
     resetScreenshot();
-    if (summaryInput) summaryInput.value = "";
     if (descriptionInput) descriptionInput.value = "";
     // Note: Menu fields are kept for next submission
   });
@@ -914,39 +901,68 @@
     captureStatus.className = "ghost-status capture-status";
     
     try {
-      // Temporarily hide the modal overlay during capture
-      const wasHidden = modal.classList.contains("hidden");
-      if (!wasHidden) {
+      // Temporarily hide the modal, menu, and toolbar during capture
+      const modalWasHidden = modal.classList.contains("hidden");
+      const menuWasHidden = menu.classList.contains("hidden");
+      const toolbarWasVisible = toolbar.style.display !== "none";
+      
+      if (!modalWasHidden) {
         modal.style.visibility = "hidden";
         modal.style.opacity = "0";
       }
+      if (!menuWasHidden) {
+        menu.style.visibility = "hidden";
+        menu.style.opacity = "0";
+      }
+      if (toolbarWasVisible) {
+        toolbar.style.visibility = "hidden";
+      }
       
-      // Small delay to ensure modal is hidden before capture
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Small delay to ensure elements are hidden before capture
+      await new Promise(resolve => setTimeout(resolve, 200));
       
-      // Capture the page (excluding the modal)
+      // Capture the page (excluding the widget elements)
       const canvas = await html2canvas(document.body, { 
         useCORS: true,
         allowTaint: true,
         logging: false,
-        windowWidth: window.innerWidth,
-        windowHeight: window.innerHeight
+        backgroundColor: null,
+        scale: 1,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        x: 0,
+        y: 0
       });
       
-      // Restore modal visibility
-      if (!wasHidden) {
+      // Restore visibility
+      if (!modalWasHidden) {
         modal.style.visibility = "";
         modal.style.opacity = "";
       }
+      if (!menuWasHidden) {
+        menu.style.visibility = "";
+        menu.style.opacity = "";
+      }
+      if (toolbarWasVisible) {
+        toolbar.style.visibility = "";
+      }
       
-      addScreenshot(canvas.toDataURL("image/png"));
+      // Check if canvas is valid
+      if (!canvas || canvas.width === 0 || canvas.height === 0) {
+        throw new Error("Canvas is empty or invalid");
+      }
+      
+      addScreenshot(canvas.toDataURL("image/png", 0.95));
       captureStatus.textContent = "Screenshot captured!";
       captureStatus.className = "ghost-status capture-status success";
     } catch (error) {
       console.error("Screenshot failed", error);
-      // Ensure modal is visible even if capture fails
+      // Ensure all elements are visible even if capture fails
       modal.style.visibility = "";
       modal.style.opacity = "";
+      menu.style.visibility = "";
+      menu.style.opacity = "";
+      toolbar.style.visibility = "";
       captureStatus.textContent = "Screenshot failed: " + error.message;
       captureStatus.className = "ghost-status capture-status error";
     }
@@ -1010,27 +1026,13 @@
     });
   });
 
-  // Auto-detect clipboard screenshot on any click in the modal
+  // Clipboard check flag (only used by paste handler and button)
   let clipboardCheckAttempted = false;
-  modal.addEventListener("click", async (e) => {
-    // Only check if we don't already have screenshots and haven't checked yet
-    if (state.screenshotData.length === 0 && !clipboardCheckAttempted) {
-      clipboardCheckAttempted = true;
-      captureStatus.textContent = "Checking clipboard...";
-      captureStatus.className = "ghost-status capture-status";
-      
-      const detected = await detectClipboardScreenshot();
-      if (!detected) {
-        // If clipboard API didn't work, the paste handler will catch it
-        captureStatus.textContent = "Take a screenshot, then paste here (Ctrl+V / Cmd+V) or click the button above";
-        captureStatus.className = "ghost-status capture-status";
-      }
-    }
-  }, { once: false });
 
   // Handle paste events - this is the most reliable method
   const handlePaste = async (e) => {
-    if (modal.classList.contains("hidden")) return;
+    // Allow paste when menu or modal is visible
+    if (modal.classList.contains("hidden") && menu.classList.contains("hidden")) return;
     
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -1053,30 +1055,29 @@
     }
   };
 
-  // Listen for paste events on the modal and document
+  // Listen for paste events on the menu, modal and document
+  menu.addEventListener("paste", handlePaste);
   modal.addEventListener("paste", handlePaste);
   document.addEventListener("paste", handlePaste);
   
   // Also add a focus handler to make paste work better
+  menu.addEventListener("focus", () => {
+    // Reset the check flag when menu gets focus
+    clipboardCheckAttempted = false;
+  });
   modal.addEventListener("focus", () => {
     // Reset the check flag when modal gets focus
     clipboardCheckAttempted = false;
   });
 
   submitBtn.addEventListener("click", async () => {
-    const summary = summaryInput ? summaryInput.value.trim() : "";
+    const summary = menuSummary ? menuSummary.value.trim() : "";
     const description = descriptionInput ? descriptionInput.value.trim() : "";
     
-    // Get all fields from menu (initial panel)
+    // Get Issue Type and Summary from menu, other fields from modal
     const issueType = menuIssueType ? menuIssueType.value.trim() : "Task";
-    const portfolio = menuPortfolio ? menuPortfolio.value.trim() : "";
-    const reporterSOEID = menuReporterSOEID ? menuReporterSOEID.value.trim() : "";
-    const assigneeSOEID = menuAssigneeSOEID ? menuAssigneeSOEID.value.trim() : "";
-    const reporter = menuReporter ? menuReporter.value.trim() : "";
-    const plannedStart = menuPlannedStart ? menuPlannedStart.value : "";
-    const plannedEnd = menuPlannedEnd ? menuPlannedEnd.value : "";
-    const parentID = menuParentID ? menuParentID.value.trim() : "";
-    const epicLink = menuEpicLink ? menuEpicLink.value.trim() : "";
+    const plannedStart = modalPlannedStart ? modalPlannedStart.value : "";
+    const plannedEnd = modalPlannedEnd ? modalPlannedEnd.value : "";
 
     if (!summary && !description) {
       submitStatus.textContent = "Summary or description is required.";
@@ -1098,14 +1099,8 @@
           summary: summary || description,
           issue_type: issueType,
           description: description,
-          portfolio: portfolio || undefined,
-          reporter_soeid: reporterSOEID || undefined,
-          assignee_soeid: assigneeSOEID || undefined,
-          reporter: reporter || undefined,
           planned_start: plannedStart || undefined,
           planned_end: plannedEnd || undefined,
-          parent_id: parentID || undefined,
-          epic_link: epicLink || undefined,
           url: window.location.href,
           userAgent: navigator.userAgent,
           screenshots: state.screenshotData, // Send as array
@@ -1123,19 +1118,17 @@
       submitStatus.className = "ghost-status submit-status success";
       
       // Clear all fields
-      if (summaryInput) summaryInput.value = "";
       if (descriptionInput) descriptionInput.value = "";
       // Clear menu fields
+      if (menuSummary) menuSummary.value = "";
       if (menuIssueType) menuIssueType.value = "Task";
-      if (menuPortfolio) menuPortfolio.value = "";
-      if (menuReporterSOEID) menuReporterSOEID.value = "";
-      if (menuAssigneeSOEID) menuAssigneeSOEID.value = "";
-      if (menuReporter) menuReporter.value = "";
-      if (menuPlannedStart) menuPlannedStart.value = "";
-      if (menuPlannedEnd) menuPlannedEnd.value = "";
-      if (menuParentID) menuParentID.value = "";
-      if (menuEpicLink) menuEpicLink.value = "";
+      // Clear modal fields
+      if (modalPlannedStart) modalPlannedStart.value = "";
+      if (modalPlannedEnd) modalPlannedEnd.value = "";
       resetScreenshot();
+      
+      // Clear template data after successful submission
+      state.templateData = null;
       
       // Dispatch event to notify main page
       window.dispatchEvent(new CustomEvent("feedbackSubmitted", {
@@ -1162,16 +1155,6 @@
     }
   });
 
-  // Expose methods globally for Launch Widget button
-  window.citiGhostWidget = {
-    openFeedback: (templateData) => {
-      openFeedbackModal(templateData);
-    },
-    removeScreenshot: (index) => {
-      removeScreenshot(index);
-    }
-  };
-
   window.addEventListener("resize", () => {
     if (!menu.classList.contains("hidden")) {
       positionMenu();
@@ -1188,10 +1171,24 @@
     }
   });
 
+  // Expose methods globally for Launch Widget button and inline onclick handlers
   window.citiGhostWidget = {
-    openMenu: () => showMenu(true),
+    openMenu: (templateData = null) => {
+      // Use setTimeout to ensure menu opens after any click events have been processed
+      setTimeout(() => {
+        // Store template data to apply when modal opens
+        if (templateData) {
+          state.templateData = templateData;
+          applyTemplateToMenu(templateData);
+        }
+        showMenu(true);
+      }, 10);
+    },
     openFeedback: (templateData) => openFeedbackModal(templateData),
     closeFeedback: closeModal,
+    removeScreenshot: (index) => {
+      removeScreenshot(index);
+    }
   };
 
   document.dispatchEvent(
