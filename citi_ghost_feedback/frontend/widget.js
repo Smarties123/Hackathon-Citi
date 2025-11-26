@@ -529,6 +529,16 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
             <div class="form-field">
+              <label for="modalReporterSOEID">Reporter SOEID</label>
+              <input type="text" id="modalReporterSOEID" class="ghost-input" placeholder="Reporter SOEID" />
+            </div>
+            
+            <div class="form-field">
+              <label for="modalReporter">Reporter Name</label>
+              <input type="text" id="modalReporter" class="ghost-input" placeholder="Reporter name" />
+            </div>
+            
+            <div class="form-field">
               <label for="modalPlannedStart">Planned Start</label>
               <input type="date" id="modalPlannedStart" class="ghost-input" />
             </div>
@@ -581,6 +591,8 @@
   const menuSummary = menu.querySelector("#menuSummary");
   
   // Modal fields (moved from menu to modal)
+  const modalReporterSOEID = modal.querySelector("#modalReporterSOEID");
+  const modalReporter = modal.querySelector("#modalReporter");
   const modalPlannedStart = modal.querySelector("#modalPlannedStart");
   const modalPlannedEnd = modal.querySelector("#modalPlannedEnd");
   const cancelBtn = modal.querySelector(".ghost-cancel");
@@ -790,6 +802,12 @@
       }
       
       // Update other modal fields if provided in template
+      if (modalReporterSOEID && templateToApply.reporterSOEID) {
+        modalReporterSOEID.value = templateToApply.reporterSOEID;
+      }
+      if (modalReporter && templateToApply.reporter) {
+        modalReporter.value = templateToApply.reporter;
+      }
       if (modalPlannedStart && templateToApply.plannedStart) {
         modalPlannedStart.value = templateToApply.plannedStart;
       }
@@ -801,6 +819,8 @@
       const descriptionField = modal.querySelector("#ghostDescription");
       if (descriptionField) descriptionField.value = "";
       // Clear all other modal fields
+      if (modalReporterSOEID) modalReporterSOEID.value = "";
+      if (modalReporter) modalReporter.value = "";
       if (modalPlannedStart) modalPlannedStart.value = "";
       if (modalPlannedEnd) modalPlannedEnd.value = "";
     }
@@ -1076,6 +1096,8 @@
     
     // Get Issue Type and Summary from menu, other fields from modal
     const issueType = menuIssueType ? menuIssueType.value.trim() : "Task";
+    const reporterSOEID = modalReporterSOEID ? modalReporterSOEID.value.trim() : "";
+    const reporter = modalReporter ? modalReporter.value.trim() : "";
     const plannedStart = modalPlannedStart ? modalPlannedStart.value : "";
     const plannedEnd = modalPlannedEnd ? modalPlannedEnd.value : "";
 
@@ -1099,6 +1121,8 @@
           summary: summary || description,
           issue_type: issueType,
           description: description,
+          reporter_soeid: reporterSOEID || undefined,
+          reporter: reporter || undefined,
           planned_start: plannedStart || undefined,
           planned_end: plannedEnd || undefined,
           url: window.location.href,
@@ -1123,6 +1147,8 @@
       if (menuSummary) menuSummary.value = "";
       if (menuIssueType) menuIssueType.value = "Task";
       // Clear modal fields
+      if (modalReporterSOEID) modalReporterSOEID.value = "";
+      if (modalReporter) modalReporter.value = "";
       if (modalPlannedStart) modalPlannedStart.value = "";
       if (modalPlannedEnd) modalPlannedEnd.value = "";
       resetScreenshot();
